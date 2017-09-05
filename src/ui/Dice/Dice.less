@@ -1,0 +1,215 @@
+@import '../params.less';
+@diceColor: #e5e5cd;
+@dotColor3: #13214c;
+@dotColor2: #20933a;
+@dotColor1: #ce7c07;
+@dotColor0: #c32341;
+@diceBorderSize: 2px;
+@diceInnerSize: @diceSize - 2*@diceBorderSize;
+@dotRadius: 6px;
+@dotBorderSize: 2px;
+@dotCircleRadius: 17px;
+@dotMid: @diceInnerSize/2 - @dotRadius;
+
+.dice {
+  background: @diceColor;
+  border-top: @diceBorderSize solid 1.11*@diceColor;
+  border-right: @diceBorderSize solid 0.90*@diceColor;
+  border-bottom: @diceBorderSize solid 0.86*@diceColor;
+  border-left: @diceBorderSize solid 1.08*@diceColor;
+  border-radius: 10px;
+  box-shadow: 6px 6px 6px #222;
+  height: @diceSize;
+  transition: @transitionTime;
+  width: @diceSize;
+
+  &.active {
+    cursor: pointer;
+  }
+
+  .diceContents {
+    height: 100%;
+    position: relative;
+    transition: @transitionTime all ease;
+    width: 100%;
+
+    .dot {
+      border-radius: @dotRadius;
+      height: 2*@dotRadius;
+      position: absolute;
+      transition: @transitionTime;
+      width: 2*@dotRadius;
+    }
+  }
+
+  // Colors of the dots.
+  &.rollsLeft3 {
+    .dot {
+      background: @dotColor3;
+      border-top: @dotBorderSize solid 0.86*@dotColor3;
+      border-right: @dotBorderSize solid 1.08*@dotColor3;
+      border-bottom: @dotBorderSize solid 1.11*@dotColor3;
+      border-left: @dotBorderSize solid 0.90*@dotColor3;
+    }
+  }
+  &.rollsLeft2 {
+    .dot {
+      background: @dotColor2;
+      border-top: @dotBorderSize solid 0.86*@dotColor2;
+      border-right: @dotBorderSize solid 1.08*@dotColor2;
+      border-bottom: @dotBorderSize solid 1.11*@dotColor2;
+      border-left: @dotBorderSize solid 0.90*@dotColor2;
+    }
+  }
+  &.rollsLeft1 {
+    .dot {
+      background: @dotColor1;
+      border-top: @dotBorderSize solid 0.86*@dotColor1;
+      border-right: @dotBorderSize solid 1.08*@dotColor1;
+      border-bottom: @dotBorderSize solid 1.11*@dotColor1;
+      border-left: @dotBorderSize solid 0.90*@dotColor1;
+    }
+  }
+  &.rollsLeft0 {
+    .dot {
+      background: @dotColor0;
+      border-top: @dotBorderSize solid 0.86*@dotColor0;
+      border-right: @dotBorderSize solid 1.08*@dotColor0;
+      border-bottom: @dotBorderSize solid 1.11*@dotColor0;
+      border-left: @dotBorderSize solid 0.90*@dotColor0;
+    }
+  }
+
+  // Dice internals: getting the dots in the right place.
+  &.noNumber {
+    .diceContents {
+      animation: spin 2s linear infinite;
+    }
+    .dot1 {
+      left: @dotMid + 0.5*@dotCircleRadius;
+      top: @dotMid - 0.866*@dotCircleRadius;
+    }
+    .dot2 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid;
+    }
+    .dot3 {
+      left: @dotMid + 0.5*@dotCircleRadius;
+      top: @dotMid + 0.866*@dotCircleRadius;
+    }
+    .dot4 {
+      left: @dotMid - 0.5*@dotCircleRadius;
+      top: @dotMid + 0.866*@dotCircleRadius;
+    }
+    .dot5 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid;
+    }
+    .dot6 {
+      left: @dotMid - 0.5*@dotCircleRadius;
+      top: @dotMid - 0.866*@dotCircleRadius;
+    }
+  }
+  &.number1 {
+    .dot1, .dot2, .dot3, .dot4, .dot5, .dot6 {
+      left: @dotMid;
+      top: @dotMid;
+    }
+  }
+  &.number2 {
+    .dot1, .dot2, .dot6 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+    .dot3, .dot4, .dot5 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+  }
+  &.number3 {
+    .dot1, .dot2 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+    .dot3, .dot6 {
+      left: @dotMid;
+      top: @dotMid;
+    }
+    .dot4, .dot5 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+  }
+  &.number4 {
+    .dot1, .dot2 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+    .dot3 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+    .dot4, .dot5 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+    .dot6 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+  }
+
+  &.number5 {
+    .dot1 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+    .dot2, .dot5 {
+      left: @dotMid;
+      top: @dotMid;
+    }
+    .dot3 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+    .dot4 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+    .dot6 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+  }
+  &.number6 {
+    .dot1 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+    .dot2 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid;
+    }
+    .dot3 {
+      left: @dotMid + @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+    .dot4 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid + @dotCircleRadius;
+    }
+    .dot5 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid;
+    }
+    .dot6 {
+      left: @dotMid - @dotCircleRadius;
+      top: @dotMid - @dotCircleRadius;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

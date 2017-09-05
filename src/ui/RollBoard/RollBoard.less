@@ -1,0 +1,431 @@
+@import '../params.less';
+@diceSeparation: 30px;
+@topMargin: 40px; // Between the top and the first dice.
+@rollDiceMargin: 50px; // Between the dice and the keepBar message.
+@keepBarPos: @topMargin + @diceSize + @diceSeparation + @rollDiceMargin;
+@keepBarDiceStart: @keepBarPos - @topMargin + 40px;
+@keepBarHeight: 126px;
+@bottomMargin: 30px; // Between the keepBar and the bottom.
+@fullHeight: @keepBarPos + @keepBarHeight + @bottomMargin;
+
+// General RollBoard style.
+.rollBoard {
+  background: @canvasColor;
+  background-image: linear-gradient(160deg, @canvasColor, 0.7*@canvasColor);
+  border-top: 4px solid 1.11*@keepBarBorder;
+  border-right: 4px solid 0.90*@keepBarBorder;
+  border-bottom: 4px solid 0.86*@keepBarBorder;
+  border-left: 4px solid 1.08*@keepBarBorder;
+  border-radius: 24px;
+  position: relative;
+  transition: @transitionTime;
+
+  .keepBar {
+    background-color: 1.5*@bgColor;
+    background-image: linear-gradient(140deg, @keepBarColor, @keepBarColor*0.85);
+    border-top: 3px solid 0.86*@keepBarBorder;
+    border-right: 3px solid 1.08*@keepBarBorder;
+    border-bottom: 3px solid 1.11*@keepBarBorder;
+    border-left: 3px solid 0.90*@keepBarBorder;
+    border-radius: 20px;
+    color: white;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, 0);
+    transition: @transitionTime;
+
+    &::after {
+      content: "Keep";
+      left: 50%;
+      position: absolute;
+      top: 3px;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  .diceContainer {
+    left: 50%;
+    height: 0;
+    position: absolute;
+    transform: translate(-50%, 0);
+    width: 0;
+    z-index: 10;
+  }
+
+  .rollButton {
+    background: 1.6*@bgColor;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, 0);
+    transition: @transitionTime;
+  }
+  .rollButton:hover {
+    background: @bgColor;
+  }
+}
+
+// The final screen.
+.rollBoard.finished {
+  .announcer {
+    margin: 54px 0px 0px 0px;
+    padding: 8px 40px;
+    text-align: center;
+  }
+  .finalScore {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 40px 0px;
+    text-align: center;
+  }
+  .buttonHolder {
+    text-align: center;
+
+    .resetButton {
+      background: 1.6*@bgColor;
+      margin: 10px auto;
+      transition: @transitionTime;
+    }
+    .resetButton:hover {
+      background: @bgColor;
+    }
+  }
+}
+
+// Positioning. There are three regions: >=760px, >=600px and smaller than that. As usual, we start with the smallest and build up from there.
+.rollBoard {
+  // Start with general stuff.
+  width: 330px;
+
+  .keepBar {
+    width: 280px;
+  }
+  .diceContainer {
+    top: @topMargin;
+    .dice {
+      position: absolute;
+    }
+  }
+
+  // Look at how things vary depending on the number of selected dice.
+  &.selected0, &.selected1, &.selected2, &.selected3, &.selected4, &.selected5, &.finished {
+    height: @fullHeight + @diceSize + @diceSeparation;
+  }
+
+  &.selected0, &.selected1, &.selected2, &.selected3 {
+    .keepBar {
+      height: @keepBarHeight;
+      top: @keepBarPos + @diceSize + @diceSeparation;
+    }
+    .rollButton {
+      top: @topMargin + 2*@diceSize + 2*@diceSeparation;
+    }
+  }
+  &.selected4, &.selected5 {
+    .keepBar {
+      height: @keepBarHeight + @diceSize + @diceSeparation;
+      top: @keepBarPos;
+    }
+    .rollButton {
+      top: @topMargin + @diceSize + @diceSeparation;
+    }
+  }
+
+  // Put the dice in the right places.
+  &.selected0 {
+    .dice.unselected0 {
+      left: -@diceSeparation - 1.5*@diceSize;
+      top: 0;
+    }
+    .dice.unselected1 {
+      left: -0.5*@diceSize;
+      top: 0;
+    }
+    .dice.unselected2 {
+      left: @diceSeparation + 0.5*@diceSize;
+      top: 0;
+    }
+    .dice.unselected3 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: @diceSeparation + @diceSize;
+    }
+    .dice.unselected4 {
+      left: 0.5*@diceSeparation;
+      top: @diceSeparation + @diceSize;
+    }
+  }
+  &.selected1 {
+    .dice.unselected0 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: 0;
+    }
+    .dice.unselected1 {
+      left: 0.5*@diceSeparation;
+      top: 0;
+    }
+    .dice.unselected2 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: @diceSeparation + @diceSize;
+    }
+    .dice.unselected3 {
+      left: 0.5*@diceSeparation;
+      top: @diceSeparation + @diceSize;
+    }
+    .dice.selected0 {
+      left: -0.5*@diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+  }
+  &.selected2 {
+    .dice.unselected0 {
+      left: -@diceSeparation - 1.5*@diceSize;
+      top: 0;
+    }
+    .dice.unselected1 {
+      left: -0.5*@diceSize;
+      top: 0;
+    }
+    .dice.unselected2 {
+      left: @diceSeparation + 0.5*@diceSize;
+      top: 0;
+    }
+    .dice.selected0 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+    .dice.selected1 {
+      left: 0.5*@diceSeparation;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+  }
+  &.selected3 {
+    .dice.unselected0 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: 0;
+    }
+    .dice.unselected1 {
+      left: 0.5*@diceSeparation;
+      top: 0;
+    }
+    .dice.selected0 {
+      left: -@diceSeparation - 1.5*@diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+    .dice.selected1 {
+      left: -0.5*@diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+    .dice.selected2 {
+      left: @diceSeparation + 0.5*@diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+  }
+  &.selected4 {
+    .dice.unselected0 {
+      left: -0.5*@diceSize;
+      top: 0;
+    }
+    .dice.selected0 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: @keepBarDiceStart;
+    }
+    .dice.selected1 {
+      left: 0.5*@diceSeparation;
+      top: @keepBarDiceStart;
+    }
+    .dice.selected2 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+    .dice.selected3 {
+      left: 0.5*@diceSeparation;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+  }
+  &.selected5 {
+    .dice.selected0 {
+      left: -@diceSeparation - 1.5*@diceSize;
+      top: @keepBarDiceStart;
+    }
+    .dice.selected1 {
+      left: -0.5*@diceSize;
+      top: @keepBarDiceStart;
+    }
+    .dice.selected2 {
+      left: @diceSeparation + 0.5*@diceSize;
+      top: @keepBarDiceStart;
+    }
+    .dice.selected3 {
+      left: -0.5*@diceSeparation - @diceSize;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+    .dice.selected4 {
+      left: 0.5*@diceSeparation;
+      top: @keepBarDiceStart + @diceSize + @diceSeparation;
+    }
+  }
+}
+
+// Setting things for large screen sizes. (Well, not incredibly small anyway.)
+@media (min-width: 760px) {
+  .rollBoard {
+    // Start with general stuff.
+    width: 510px;
+
+    .keepBar {
+      width: 460px;
+    }
+
+    // Look at how things vary depending on the number of selected dice.
+    &.selected0, &.selected1, &.selected2, &.selected3, &.selected4, &.selected5, &.finished {
+      height: @fullHeight;
+
+      .keepBar {
+        height: @keepBarHeight;
+        top: @keepBarPos;
+      }
+      .rollButton {
+        top: @topMargin + @diceSize + @diceSeparation;
+      }
+    }
+
+    // Put the dice in the right places.
+    &.selected0 {
+      .dice.unselected0, .dice.unselected1, .dice.unselected2, .dice.unselected3, .dice.unselected4 {
+        top: 0;
+      }
+      .dice.selected0, .dice.selected1, .dice.selected2, .dice.selected3, .dice.selected4 {
+        top: @keepBarDiceStart;
+      }
+      .dice.unselected0 {
+        left: -2*@diceSeparation - 2.5*@diceSize;
+      }
+      .dice.unselected1 {
+        left: -@diceSeparation - 1.5*@diceSize;
+      }
+      .dice.unselected2 {
+        left: -0.5*@diceSize;
+      }
+      .dice.unselected3 {
+        left: @diceSeparation + 0.5*@diceSize;
+      }
+      .dice.unselected4 {
+        left: 2*@diceSeparation + 1.5*@diceSize;
+      }
+    }
+    &.selected1 {
+      .dice.unselected0, .dice.unselected1, .dice.unselected2, .dice.unselected3, .dice.unselected4 {
+        top: 0;
+      }
+      .dice.selected0, .dice.selected1, .dice.selected2, .dice.selected3, .dice.selected4 {
+        top: @keepBarDiceStart;
+      }
+      .dice.unselected0 {
+        left: -1.5*@diceSeparation - 2*@diceSize;
+      }
+      .dice.unselected1 {
+        left: -0.5*@diceSeparation - @diceSize;
+      }
+      .dice.unselected2 {
+        left: 0.5*@diceSeparation;
+      }
+      .dice.unselected3 {
+        left: 1.5*@diceSeparation + @diceSize;
+      }
+      .dice.selected0 {
+        left: -0.5*@diceSize;
+      }
+    }
+    &.selected2 {
+      .dice.unselected0, .dice.unselected1, .dice.unselected2, .dice.unselected3, .dice.unselected4 {
+        top: 0;
+      }
+      .dice.selected0, .dice.selected1, .dice.selected2, .dice.selected3, .dice.selected4 {
+        top: @keepBarDiceStart;
+      }
+      .dice.unselected0 {
+        left: -@diceSeparation - 1.5*@diceSize;
+      }
+      .dice.unselected1 {
+        left: -0.5*@diceSize;
+      }
+      .dice.unselected2 {
+        left: @diceSeparation + 0.5*@diceSize;
+      }
+      .dice.selected0 {
+        left: -0.5*@diceSeparation - @diceSize;
+      }
+      .dice.selected1 {
+        left: 0.5*@diceSeparation;
+      }
+    }
+    &.selected3 {
+      .dice.unselected0, .dice.unselected1, .dice.unselected2, .dice.unselected3, .dice.unselected4 {
+        top: 0;
+      }
+      .dice.selected0, .dice.selected1, .dice.selected2, .dice.selected3, .dice.selected4 {
+        top: @keepBarDiceStart;
+      }
+      .dice.unselected0 {
+        left: -0.5*@diceSeparation - @diceSize;
+      }
+      .dice.unselected1 {
+        left: 0.5*@diceSeparation;
+      }
+      .dice.selected0 {
+        left: -@diceSeparation - 1.5*@diceSize;
+      }
+      .dice.selected1 {
+        left: -0.5*@diceSize;
+      }
+      .dice.selected2 {
+        left: @diceSeparation + 0.5*@diceSize;
+      }
+    }
+    &.selected4 {
+      .dice.unselected0, .dice.unselected1, .dice.unselected2, .dice.unselected3, .dice.unselected4 {
+        top: 0;
+      }
+      .dice.selected0, .dice.selected1, .dice.selected2, .dice.selected3, .dice.selected4 {
+        top: @keepBarDiceStart;
+      }
+      .dice.unselected0 {
+        left: -0.5*@diceSize;
+      }
+      .dice.selected0 {
+        left: -1.5*@diceSeparation - 2*@diceSize;
+      }
+      .dice.selected1 {
+        left: -0.5*@diceSeparation - @diceSize;
+      }
+      .dice.selected2 {
+        left: 0.5*@diceSeparation;
+      }
+      .dice.selected3 {
+        left: 1.5*@diceSeparation + @diceSize;
+      }
+    }
+    &.selected5 {
+      .dice.unselected0, .dice.unselected1, .dice.unselected2, .dice.unselected3, .dice.unselected4 {
+        top: 0;
+      }
+      .dice.selected0, .dice.selected1, .dice.selected2, .dice.selected3, .dice.selected4 {
+        top: @keepBarDiceStart;
+      }
+      .dice.selected0 {
+        left: -2*@diceSeparation - 2.5*@diceSize;
+      }
+      .dice.selected1 {
+        left: -@diceSeparation - 1.5*@diceSize;
+      }
+      .dice.selected2 {
+        left: -0.5*@diceSize;
+      }
+      .dice.selected3 {
+        left: @diceSeparation + 0.5*@diceSize;
+      }
+      .dice.selected4 {
+        left: 2*@diceSeparation + 1.5*@diceSize;
+      }
+    }
+  }
+}
