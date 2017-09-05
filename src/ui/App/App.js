@@ -1,10 +1,8 @@
 import './App.css'
 
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 
-import firebase from '../../config/firebase.js'
-import logo from '../../logo.svg'
+// import firebase from '../../config/firebase.js'
 
 import Yahtzee from '../Yahtzee/Yahtzee.js'
 

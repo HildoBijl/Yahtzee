@@ -2,7 +2,6 @@ import './ScoreCard.css'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import classnames from 'classnames'
 
 import gameActions from '../../redux/gameState.js'
 import { getFieldDisplayValue, showFieldValue, isFieldTaken, canClickOnField, getNumberFieldSum, getNonNumberFieldSum, getBonus, getGameScore, showBonus } from '../../redux/gameState.js'
@@ -21,6 +20,7 @@ class ScoreCard extends Component {
         case 3: return "Fours"
         case 4: return "Fives"
         case 5: return "Sixes"
+        default: throw new Error('Could not get the title for a field with index "' + ind + '".')
       }
     } else {
       switch(ind - yana.numSides) {
@@ -31,9 +31,9 @@ class ScoreCard extends Component {
         case 4: return "Large straight"
         case 5: return "Chance"
         case 6: return "Yahtzee"
+        default: throw new Error('Could not get the title for a field with index "' + ind + '".')
       }
     }
-    throw 'Cannot obtain field title for field ' + ind + '.'
   }
 
   getScoreField(fieldIndex) {

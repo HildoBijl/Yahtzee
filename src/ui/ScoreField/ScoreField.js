@@ -4,7 +4,6 @@ import classnames from 'classnames'
 
 export default class ScoreField extends Component {
   render() {
-    const val = this.props.value
     return (
       <div
         className={classnames(

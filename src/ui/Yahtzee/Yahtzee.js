@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import gameActions from '../../redux/gameState.js'
-import { getFieldDisplayValue, showFieldValue, isFieldTaken, canClickOnField, canClickOnDice, canRollDice, getNumberFieldSum, getNonNumberFieldSum, getBonus, getGameScore, showBonus, isGameFinished } from '../../redux/gameState.js'
+import { canClickOnField, canClickOnDice, canRollDice, isGameFinished } from '../../redux/gameState.js'
 import yana from '../../logic/yahtzeeAnalysis.js'
 
 import RollBoard from '../RollBoard/RollBoard.js'
@@ -34,7 +34,7 @@ class Yahtzee extends Component {
     }
     
     // Is it a number? And do we either still have rolls left or was the ctrl key pressed? In that case, we should select the corresponding dice.
-    const keyAsInt = parseInt(event.key)
+    const keyAsInt = parseInt(event.key, 10)
     if (canClickOnDice(gs) && keyAsInt >= 1 && keyAsInt <= yana.numSides && gs.rollsLeft > 0 && !event.ctrlKey) {
       this.props.pressNumber(keyAsInt)
       event.preventDefault()
@@ -43,7 +43,7 @@ class Yahtzee extends Component {
 
     // Is it a field we need to select?
     const fieldIndex = this.getFieldFromKey(event.key)
-    if (fieldIndex != -1 && canClickOnField(gs, fieldIndex)) {
+    if (fieldIndex !== -1 && canClickOnField(gs, fieldIndex)) {
       this.props.clickField(fieldIndex)
       event.preventDefault()
       return
@@ -53,27 +53,34 @@ class Yahtzee extends Component {
   // getFieldFromKey receives a key that was pressed and returns which field should be selected (0 through the number of fields). In case no field is matched, it returns -1.
   getFieldFromKey(key) {
     // Check the number fields first.
-    const keyAsInt = parseInt(key)
+    const keyAsInt = parseInt(key, 10)
     if (keyAsInt >= 1 && keyAsInt <= yana.numSides)
       return keyAsInt - 1
     
-    // Check the other fields second.
+    // Check the other fields second. Check for first letters of names, check grid hotkeys and add some extra back-ups.
     switch (key) {
       case "t":
+      case "q":
         return yana.numSides + 0
       case "f":
+      case "a":
         return yana.numSides + 1
       case "h":
+      case "z":
+      case "u":
         return yana.numSides + 2
       case "s":
         return yana.numSides + 3
       case "l":
+      case "x":
         return yana.numSides + 4
       case "c":
         return yana.numSides + 5
       case "y":
+      case "v":
         return yana.numSides + 6
       default: // Haven't found any field.
+        console.log(key)
         return -1
     }
   }

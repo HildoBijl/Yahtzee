@@ -6,7 +6,6 @@ import classnames from 'classnames'
 
 import gameActions from '../../redux/gameState.js'
 import { isGameFinished, getGameScore, getNumSelectedDice, enableRollButton } from '../../redux/gameState.js'
-import yana from '../../logic/yahtzeeAnalysis.js'
 
 import Dice from '../Dice/Dice.js'
 
