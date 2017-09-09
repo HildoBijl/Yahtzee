@@ -5,10 +5,10 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-import gameActions from '../../redux/gameState.js'
-import { isAFieldSelected, getDicePositionInCategory, canClickOnDice } from '../../redux/gameState.js'
-import { createAscendingArray } from '../../logic/util.js'
-import yana from '../../logic/yahtzeeAnalysis.js'
+import gameActions from '../../../redux/gameState.js'
+import { isAFieldSelected, getDicePositionInCategory, canClickOnDice } from '../../../redux/gameState.js'
+import { createAscendingArray } from '../../../logic/util.js'
+import yana from '../../../logic/yahtzeeAnalysis.js'
 
 class Dice extends Component {
   render() {
@@ -24,6 +24,7 @@ class Dice extends Component {
           'dice',
           'dice' + index,
           number <= 0 ? 'noNumber' : ('number' + number),
+          (selected ? 'selected' : 'unselected'),
           (selected ? 'selected' : 'unselected') + getDicePositionInCategory(gs, index),
           'rollsLeft' + rollsLeft,
           {active},

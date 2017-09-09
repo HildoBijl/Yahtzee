@@ -3,12 +3,12 @@ import './ScoreCard.css'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import gameActions from '../../redux/gameState.js'
-import { getFieldDisplayValue, showFieldValue, isFieldTaken, canClickOnField, getNumberFieldSum, getNonNumberFieldSum, getBonus, getGameScore, showBonus } from '../../redux/gameState.js'
-import yana from '../../logic/yahtzeeAnalysis.js'
-import { createAscendingArray } from '../../logic/util.js'
+import gameActions from '../../../redux/gameState.js'
+import { getFieldDisplayValue, showFieldValue, isFieldTaken, canClickOnField, getNumberFieldSum, getNonNumberFieldSum, getBonus, getGameScore, showBonus } from '../../../redux/gameState.js'
+import yana from '../../../logic/yahtzeeAnalysis.js'
+import { createAscendingArray } from '../../../logic/util.js'
 
-import ScoreField from '../ScoreField/ScoreField.js'
+import ScoreField from './ScoreField.js'
 
 class ScoreCard extends Component {
   getFieldTitle(ind) {
@@ -71,7 +71,7 @@ class ScoreCard extends Component {
             <ScoreField title="Sum" type="meta" value={getNonNumberFieldSum(gs)} addClass="nonDiceSum" />
           </div>
         </div>
-        <ScoreField title="Final score" type="meta" value={getGameScore(gs)} />
+        <ScoreField title="Total score" type="meta" addClass="totalScore" value={getGameScore(gs)} />
       </div>
     )
   }

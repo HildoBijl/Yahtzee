@@ -3,12 +3,12 @@ import './Yahtzee.css'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import gameActions from '../../redux/gameState.js'
-import { canClickOnField, canClickOnDice, canRollDice, isGameFinished } from '../../redux/gameState.js'
-import yana from '../../logic/yahtzeeAnalysis.js'
+import gameActions from '../../../redux/gameState.js'
+import { canClickOnField, canClickOnDice, canRollDice, isGameFinished } from '../../../redux/gameState.js'
+import yana from '../../../logic/yahtzeeAnalysis.js'
 
-import RollBoard from '../RollBoard/RollBoard.js'
-import ScoreCard from '../ScoreCard/ScoreCard.js'
+import Main from '../Main/Main.js'
+import ScoreCard from '../../components/ScoreCard/ScoreCard.js'
 
 class Yahtzee extends Component {
   componentDidMount() {
@@ -66,8 +66,8 @@ class Yahtzee extends Component {
       case "a":
         return yana.numSides + 1
       case "h":
-      case "z":
       case "u":
+      case "z":
         return yana.numSides + 2
       case "s":
         return yana.numSides + 3
@@ -80,7 +80,6 @@ class Yahtzee extends Component {
       case "v":
         return yana.numSides + 6
       default: // Haven't found any field.
-        console.log(key)
         return -1
     }
   }
@@ -88,7 +87,7 @@ class Yahtzee extends Component {
   render() {
     return (
       <div className="yahtzee">
-        <RollBoard />
+        <Main />
         <ScoreCard />
       </div>
     )

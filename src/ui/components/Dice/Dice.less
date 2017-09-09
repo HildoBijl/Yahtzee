@@ -1,15 +1,10 @@
-@import '../params.less';
-@diceColor: #e5e5cd;
-@dotColor3: #13214c;
-@dotColor2: #20933a;
-@dotColor1: #ce7c07;
-@dotColor0: #c32341;
+@import '../../params.less';
+
 @diceBorderSize: 2px;
-@diceInnerSize: @diceSize - 2*@diceBorderSize;
-@dotRadius: 6px;
+@dotRadius: 10.7%;
 @dotBorderSize: 2px;
-@dotCircleRadius: 17px;
-@dotMid: @diceInnerSize/2 - @dotRadius;
+@dotCircleRadius: 30%;
+@dotMid: 50% - @dotRadius; // The position of a dot if it would be placed in the middle of the dice.
 
 .dice {
   background: @diceColor;
@@ -17,11 +12,11 @@
   border-right: @diceBorderSize solid 0.90*@diceColor;
   border-bottom: @diceBorderSize solid 0.86*@diceColor;
   border-left: @diceBorderSize solid 1.08*@diceColor;
-  border-radius: 10px;
-  box-shadow: 6px 6px 6px #222;
-  height: @diceSize;
+  border-radius: 16%;
+  box-shadow: 10% 10% 10% #222;
   transition: @transitionTime;
-  width: @diceSize;
+	user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 
   &.active {
     cursor: pointer;
@@ -34,7 +29,7 @@
     width: 100%;
 
     .dot {
-      border-radius: @dotRadius;
+      border-radius: 50%;
       height: 2*@dotRadius;
       position: absolute;
       transition: @transitionTime;
@@ -42,73 +37,36 @@
     }
   }
 
-  // Colors of the dots.
-  &.rollsLeft3 {
-    .dot {
-      background: @dotColor3;
-      border-top: @dotBorderSize solid 0.86*@dotColor3;
-      border-right: @dotBorderSize solid 1.08*@dotColor3;
-      border-bottom: @dotBorderSize solid 1.11*@dotColor3;
-      border-left: @dotBorderSize solid 0.90*@dotColor3;
+  // Colors of the dots. We loop through the color list.
+  .rollsLeftLoop (@i) when (@i >= 0) {
+    &.rollsLeft@{i} {
+      @rollsLeftColor: extract(@dotColors, @i + 1);
+      .dot {
+        background: @rollsLeftColor;
+        border-top: @dotBorderSize solid 0.86*@rollsLeftColor;
+        border-right: @dotBorderSize solid 1.08*@rollsLeftColor;
+        border-bottom: @dotBorderSize solid 1.11*@rollsLeftColor;
+        border-left: @dotBorderSize solid 0.90*@rollsLeftColor;
+      }
     }
+    .rollsLeftLoop(@i - 1);
   }
-  &.rollsLeft2 {
-    .dot {
-      background: @dotColor2;
-      border-top: @dotBorderSize solid 0.86*@dotColor2;
-      border-right: @dotBorderSize solid 1.08*@dotColor2;
-      border-bottom: @dotBorderSize solid 1.11*@dotColor2;
-      border-left: @dotBorderSize solid 0.90*@dotColor2;
-    }
-  }
-  &.rollsLeft1 {
-    .dot {
-      background: @dotColor1;
-      border-top: @dotBorderSize solid 0.86*@dotColor1;
-      border-right: @dotBorderSize solid 1.08*@dotColor1;
-      border-bottom: @dotBorderSize solid 1.11*@dotColor1;
-      border-left: @dotBorderSize solid 0.90*@dotColor1;
-    }
-  }
-  &.rollsLeft0 {
-    .dot {
-      background: @dotColor0;
-      border-top: @dotBorderSize solid 0.86*@dotColor0;
-      border-right: @dotBorderSize solid 1.08*@dotColor0;
-      border-bottom: @dotBorderSize solid 1.11*@dotColor0;
-      border-left: @dotBorderSize solid 0.90*@dotColor0;
-    }
-  }
+  .rollsLeftLoop(length(@dotColors) - 1);
 
   // Dice internals: getting the dots in the right place.
   &.noNumber {
     .diceContents {
       animation: spin 2s linear infinite;
     }
-    .dot1 {
-      left: @dotMid + 0.5*@dotCircleRadius;
-      top: @dotMid - 0.866*@dotCircleRadius;
+    // Loop through the dots, putting them in a circle.
+    .dotLoop (@i) when (@i > 0) {
+      .dot@{i} {
+        left: @dotMid + sin(-30deg + @i*60deg)*@dotCircleRadius;
+        top: @dotMid - cos(-30deg + @i*60deg)*@dotCircleRadius;
+      }
+      .dotLoop(@i - 1);
     }
-    .dot2 {
-      left: @dotMid + @dotCircleRadius;
-      top: @dotMid;
-    }
-    .dot3 {
-      left: @dotMid + 0.5*@dotCircleRadius;
-      top: @dotMid + 0.866*@dotCircleRadius;
-    }
-    .dot4 {
-      left: @dotMid - 0.5*@dotCircleRadius;
-      top: @dotMid + 0.866*@dotCircleRadius;
-    }
-    .dot5 {
-      left: @dotMid - @dotCircleRadius;
-      top: @dotMid;
-    }
-    .dot6 {
-      left: @dotMid - 0.5*@dotCircleRadius;
-      top: @dotMid - 0.866*@dotCircleRadius;
-    }
+    .dotLoop(6);
   }
   &.number1 {
     .dot1, .dot2, .dot3, .dot4, .dot5, .dot6 {
@@ -158,7 +116,6 @@
       top: @dotMid - @dotCircleRadius;
     }
   }
-
   &.number5 {
     .dot1 {
       left: @dotMid + @dotCircleRadius;
@@ -213,3 +170,17 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+@media @phone {
+  .dice {
+    height: @diceSizeSmall;
+    width: @diceSizeSmall;
+  }
+}
+@media @desktop {
+  .dice {
+    height: @diceSizeLarge;
+    width: @diceSizeLarge;
+  }
+}
+
