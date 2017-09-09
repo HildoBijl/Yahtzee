@@ -1,28 +1,47 @@
 import './MenuItem.css'
 
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-export default class MenuItem extends Component {
+import goTo from '../../../redux/router.js'
+
+class MenuItem extends Component {
+  activate() {
+    this.props.goTo(this.props.page.url, this.getCurrentUrl())
+  }
+  getCurrentUrl() {
+    return this.props.router.result ? this.props.router.result.url : '/'
+  }
+  isActive() {
+    return this.getCurrentUrl() === this.props.page.url
+  }
   render() {
-		const Icon = this.props.icon
+    const page = this.props.page
     return (
       <div
         className={classnames(
           "menuItem",
-          {"active": this.props.active},
+          {active: this.isActive()},
         )}
+        onClick={this.activate.bind(this)}
       >
-        <Icon />
-        <div className="title">{this.props.title}</div>
+        <page.icon />
+        <div className="title">{page.menuLabel}</div>
       </div>
     )
   }
 }
 
-MenuItem.propTypes = {
-	icon: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  active: PropTypes.bool.isRequired,
-}
+export default connect(
+  function mapStateToProps(state) {
+    return {
+      router: state.router,
+    }
+  },
+  function mapDispatchToProps(dispatch) {
+    return {
+      goTo: (url, currentUrl) => dispatch(goTo(url, currentUrl)),
+    }
+  }
+)(MenuItem)

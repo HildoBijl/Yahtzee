@@ -3,20 +3,22 @@ import './Menu.css'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import User from '../../icons/User.js'
-import Info from '../../icons/Info.js'
-import Cog from '../../icons/Cog.js'
-import Dice from '../../icons/Dice.js'
+import routes from '../../../config/routes.js'
+
 import MenuItem from './MenuItem.js'
 
 class Menu extends Component {
+  goTo(path) {
+
+  }
   render() {
+    const menu = []
+    for (let url in routes) {
+      menu.push(<MenuItem key={url} page={routes[url]} />)
+    }
     return (
       <nav className="menu">
-				<MenuItem icon={Dice} title="Yahtzee" active={true} />
-				<MenuItem icon={Cog} title="Settings" active={false} />
-				<MenuItem icon={User} title="Account" active={false} />
-				<MenuItem icon={Info} title="About" active={false} />
+        {menu}
       </nav>
     )
   }
@@ -25,6 +27,7 @@ class Menu extends Component {
 export default connect(
   function mapStateToProps(state) {
     return {
+      router: state.router,
     }
   },
   function mapDispatchToProps(dispatch) {
