@@ -23,6 +23,11 @@ const actions = {
   resetGame: () => ({
     type: 'ResetGame',
   }),
+  loadSolution: () => (
+    (dispatch) => {
+      yana.initialize().then(() => dispatch({ type: 'SolutionLoaded'}))
+    }
+  )
 }
 export default actions
 
@@ -111,6 +116,9 @@ export function reducer(gs = newGameState(), action) {
       if (isAFieldSelected(gs))
         gs = applyFieldSelection(gs)
 
+      // Find the expected score of the state we're currently in, so we can check out how lucky the upcoming roll is.
+      const expectedScoreBeforeRoll = getExpectedScoreOfRoll(gs)
+
       // Set up rerolls. Apply them according to the order that the dice already have.
       const numUnselectedDice = getNumUnselectedDice(gs)
       let newDice = new Array(numUnselectedDice).fill(0).map(() => Math.ceil(Math.random() * (yana.numSides))).sort()
@@ -131,7 +139,8 @@ export function reducer(gs = newGameState(), action) {
         dice: newDice,
         diceOrder: newOrder,
         rollsLeft: gs.rollsLeft - 1,
-        lastRollAt: new Date()
+        lastRollAt: new Date(),
+        expectedScoreBeforeRoll,
       }
     }
 
@@ -139,7 +148,14 @@ export function reducer(gs = newGameState(), action) {
       if (!canResetGame(gs))
         throw new Error('Cannot reset the game at this moment.')
 
-      return newGameState()
+      return updateLastAnalysis(newGameState(gs.solutionAvailable))
+    }
+
+    case 'SolutionLoaded': {
+      return updateLastAnalysis({
+        ...gs,
+        solutionAvailable: true,
+      })
     }
 
     default: {
@@ -148,7 +164,7 @@ export function reducer(gs = newGameState(), action) {
   }
 }
 
-function newGameState() {
+function newGameState(solutionAvailable = false) {
   return {
     scores: new Array(yana.numFields).fill(-1),
     dice: new Array(yana.numDice).fill(-1),
@@ -157,6 +173,8 @@ function newGameState() {
     rollsLeft: yana.numRolls,
     lastRollAt: new Date(),
     selectedField: -1,
+    solutionAvailable: solutionAvailable,
+    expectedScoreBeforeRoll: -1,
   }
 }
 
@@ -170,15 +188,15 @@ function applyFieldSelection(gs) {
   let scores = gs.scores.slice(0)
   scores[gs.selectedField] = yana.fieldScore(gs.selectedField, sortedDice)
 
-  // Update and return the state.
-  return {
+  // Update and return the state. We also update the lastAnalysis parameter, since obviously the simplified state has changed.
+  return updateLastAnalysis({
     ...gs,
     scores: scores,
     dice: new Array(yana.numDice).fill(-1),
     selectedDice: new Array(yana.numDice).fill(false),
     rollsLeft: yana.numRolls,
     selectedField: -1,
-  }
+  })
 }
 
 /*
@@ -200,6 +218,10 @@ export function getNumRemainingFields(gs) {
 
 export function isGameFinished(gs) {
   return getNumRemainingFields(gs) === 0
+}
+
+export function isGameJustStarting(gs) {
+  return gs.rollsLeft === yana.numRolls && getNumRemainingFields(gs) === yana.numFields
 }
 
 export function getNumSelectedDice(gs) {
@@ -318,4 +340,89 @@ export function enableRollButton(gs) {
 
 export function canResetGame(gs) {
   return isGameFinished(gs)
+}
+
+// updateLastAnalysis will update the lastAnalysis field of the yahtzeeAnalysis object, setting it to the analysis of the given game state. It returns the given gameState, to allow for the chaining of methods.
+export function updateLastAnalysis(gs) {
+  // If we don't have a solution, then no analysis is available. We cannot do anything.
+  if (!gs.solutionAvailable)
+    return gs
+  
+  // Set up a simplified state and extract its analysis.
+  const simplifiedState = {
+    taken: gs.scores.map((v, i) => (v !== -1 || i === gs.selectedField)),
+    bonus: getNumberFieldSum(gs),
+  }
+  yana.lastAnalysis = yana.analyzeState(simplifiedState)
+  return gs
+}
+
+// getExpectedScore returns the expected value of the score that we can reach, given optimal play, from the given game state.
+export function getExpectedScore(gs) {
+  // If no solutions are known, return the indicator -1.
+  if (!gs.solutionAvailable)
+    return -1
+
+  // Set up a simplified state and feed it to the analysis script. The expected score is the value (the expected score we will get in the future) plus the current score.
+  const simplifiedState = {
+    taken: gs.scores.map((v, i) => (v !== -1 || i === gs.selectedField)),
+    bonus: getNumberFieldSum(gs),
+  }
+  return yana.getValue(simplifiedState) + getGameScore(gs)
+}
+
+// getExpectedScoreOfRoll will return the expected score for a given roll. It assumes that the lastAnalysis field of the yahtzeeAnalysis object has been set to that of the given game state. 
+export function getExpectedScoreOfRoll(gs) {
+  // If no solutions are known, return the indicator -1.
+  if (!gs.solutionAvailable)
+    return -1
+
+  // If there is no roll yet, return the general value of the state.
+  if (gs.rollsLeft === yana.numRolls)
+    return yana.lastAnalysis[0] + getGameScore(gs)
+
+  // Get the analysis values of the current state and roll.
+  const sortedDice = gs.dice.slice(0).sort().reverse()
+  const rollIndex = yana.getRollIndex(sortedDice)
+  const analysis = yana.lastAnalysis[yana.numRolls - gs.rollsLeft]
+
+  // We just want to know the expected score for the roll, so that can be extracted directly. 
+  const rollValue = analysis.rollValues[rollIndex]
+  return rollValue + getGameScore({...gs, selectedField: -1})
+}
+
+export function getExpectedScoreOfChoice(gs) {
+  // If no solutions are known, return the indicator -1.
+  if (!gs.solutionAvailable)
+    return -1
+
+  // If there is no roll yet, return the general value of the state.
+  if (gs.rollsLeft === yana.numRolls)
+    return yana.lastAnalysis[0]
+
+  // Get the analysis values of the given state and roll.
+  const sortedDice = gs.dice.slice(0).sort().reverse()
+  const rollIndex = yana.getRollIndex(sortedDice)
+
+  // If a field has been selected, then we evaluate that choice. 
+  if (gs.selectedField !== -1) {
+    const analysis = yana.lastAnalysis[yana.numRolls]
+    const fieldValue = analysis.fieldValues[rollIndex][gs.selectedField]
+    return fieldValue + getGameScore({...gs, selectedField: -1})
+  }
+
+  // If there are no rolls left, and no field has been selected, then no choice has been made yet. We return -1 to indicate this.
+  if (gs.rollsLeft === 0)
+    return -1
+  
+  // We analyze the hold that has been made.
+  const analysis = yana.lastAnalysis[yana.numRolls - gs.rollsLeft]
+  const hold = gs.dice.reduce((hold,v,i) => {
+    if (gs.selectedDice[i])
+      hold.push(v)
+    return hold
+  }, []).sort((a,b) => (b - a))
+  const holdIndex = yana.getHoldIndex(hold)
+  const holdValue = analysis.holdValues[holdIndex]
+  return holdValue + getGameScore(gs)
 }

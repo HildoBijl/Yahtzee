@@ -39,11 +39,9 @@ const yahtzeeAnalysis = (() => {
       this.calculateTriangleNumbers() // Helpful numbers to be used during the game analysis.
     }
 
-    // initialize sets up the game. It can only be called when a window object is already present. An optional callback can be provided.
-    initialize(cb) {
-      if (!window)
-        throw new Error('A Yahtzee object was told to initialize, but now window object is present yet.')
-      this.loadValues(cb)
+    // initialize sets up the game. It returns a promise.
+    initialize() {
+      return this.loadValues()
     }
 
     // calculateTriangleNumbers will calculate the triangle numbers needed for analyzing the game.
@@ -305,22 +303,27 @@ const yahtzeeAnalysis = (() => {
       return '{"type":"compressed","values":[[' + this.compressedValues.map((v) => v.join(',')).join('],[') + ']]}'
     }
 
-    // loadValues loads the values for the given game, extracting the JSON object and passing it on to the importValues function, after which the given callback function is called.
-    loadValues(cb) {
-      getJSON('analysis/YahtzeeSolution' + (this.version.charAt(0).toUpperCase() + this.version.slice(1)) + 'Compressed.json')
+    // loadValues loads the values for the given game, extracting the JSON object and passing it on to the importValues function.
+    loadValues() {
+      // If we already have values, we don't need to load them again.
+      if (this.values.length > 0)
+        return Promise.resolve()
+
+      // Load the values. Try both files that are available.
+      return getJSON('analysis/YahtzeeSolution' + (this.version.charAt(0).toUpperCase() + this.version.slice(1)) + 'Compressed.json')
         .catch((err) => {
           // First load attempt failed. Trying second.
           return getJSON('YahtzeeSolution' + (this.version.charAt(0).toUpperCase() + this.version.slice(1)) + '.json')
         })
         .catch((err) => {
           // Second load attempt failed.
-          this.analyze()
-          return false
+          // this.analyze() // We could analyze things, but that will take too long. It's better to gently handle things.
+          return Promise.reject(err)
         })
         .then((data) => {
           // Data was obtained, either from the first file, from the second file or from the "return false" statement.
           this.importValues(data)
-          cb && cb() // Call the callback if it exists.
+          return Promise.resolve()
         })
     }
 

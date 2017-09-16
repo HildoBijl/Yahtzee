@@ -21,7 +21,7 @@ class Main extends Component {
 
     // Define the page that should be shown for the game.
     const gamePage = isGameFinished(this.props.gameState) ? <EndingScreen/> : <RollBoard/>
-    console.log(this.props.router)
+
     // Set up the right page.
     return (
       <div className="main">

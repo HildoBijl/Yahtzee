@@ -13,6 +13,7 @@ import ScoreCard from '../../components/ScoreCard/ScoreCard.js'
 class Yahtzee extends Component {
   componentDidMount() {
     document.onkeydown = this.handleKeyPress.bind(this)
+    this.props.loadSolution()
   }
 
   // handleKeyPress is called when a key is pressed. It figures out whether something needs to be done and, if so, makes the appropriate calls.
@@ -106,6 +107,7 @@ export default connect(
       clickField: (fieldIndex) => dispatch(gameActions.clickField(fieldIndex)),
       pressNumber: (number) => dispatch(gameActions.pressNumber(number)),
       resetGame: () => dispatch(gameActions.resetGame()),
+      loadSolution: () => dispatch(gameActions.loadSolution()),
     }
   }
 )(Yahtzee)

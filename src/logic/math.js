@@ -1,3 +1,5 @@
+// This file has some useful mathematical support functions.
+
 // factorial returns the factorial of the non-negative integer n.
 export function factorial(n) {
   if (n < 0)

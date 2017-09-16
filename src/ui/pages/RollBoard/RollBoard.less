@@ -45,6 +45,17 @@
     transform: translate(-50%, 0);
     position: absolute;
   }
+
+  .choiceFeedback, .luckFeedback {
+    padding: 7px;
+    position: absolute;
+  }
+  .choiceFeedback {
+    left: 16px;
+  }
+  .luckFeedback {
+    right: 16px;
+  }
 }
 
 // Positioning style for phones.
@@ -60,7 +71,7 @@
       width: ~"calc(100% - 20px)";
     }
 
-    .rollButton {
+    .rollButton, .choiceFeedback, .luckFeedback {
       top: @keepBarTop - 46px;
     }
 
@@ -90,7 +101,7 @@
       width: ~"calc(100% - 40px)";
     }
 
-    .rollButton {
+    .rollButton, .choiceFeedback, .luckFeedback {
       top: @keepBarTop - 46px;
     }
 
