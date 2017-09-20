@@ -8,7 +8,7 @@ import goTo from '../../../redux/router.js'
 
 class MenuItem extends Component {
   activate() {
-    this.props.goTo(this.props.page.url, this.getCurrentUrl())
+    this.props.goTo(this.props.page.url, this.getCurrentUrl(), this.props.router.previous)
   }
   getCurrentUrl() {
     return this.props.router.result ? this.props.router.result.url : '/'
@@ -41,7 +41,7 @@ export default connect(
   },
   function mapDispatchToProps(dispatch) {
     return {
-      goTo: (url, currentUrl) => dispatch(goTo(url, currentUrl)),
+      goTo: (url, currentUrl, previous) => dispatch(goTo(url, currentUrl, previous)),
     }
   }
 )(MenuItem)

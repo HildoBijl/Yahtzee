@@ -8,9 +8,6 @@ import routes from '../../../config/routes.js'
 import MenuItem from './MenuItem.js'
 
 class Menu extends Component {
-  goTo(path) {
-
-  }
   render() {
     const menu = []
     for (let url in routes) {
@@ -31,7 +28,6 @@ export default connect(
     }
   },
   function mapDispatchToProps(dispatch) {
-    return {
-    }
+    return {}
   }
 )(Menu)
