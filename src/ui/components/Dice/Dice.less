@@ -175,12 +175,21 @@
   .dice {
     height: @diceSizeSmall;
     width: @diceSizeSmall;
+    
+    &.small {
+      height: @diceSizeSmall/2;
+      width: @diceSizeSmall/2;
+    }
   }
 }
 @media @desktop {
   .dice {
     height: @diceSizeLarge;
     width: @diceSizeLarge;
+    
+    &.small {
+      height: @diceSizeLarge/2;
+      width: @diceSizeLarge/2;
+    }
   }
 }
-

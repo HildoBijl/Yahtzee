@@ -2,16 +2,22 @@ import './Account.css'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 
 import userActions from '../../../redux/user.js'
 import { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
 
+import Dice from '../../components/Dice/Dice.js'
+
+const hideNotificationAfter = 6000
+
 class Account extends Component {
   getNotification() {
-    if (!this.props.user.notification)
+    // Check if there is a valid notification.
+    const notification = this.props.user.notification
+    if (!notification || new Date() - notification.date > hideNotificationAfter)
       return ''
-    // ToDo: check notificationAt.
-    return <p>{this.props.user.notification}</p>
+    return <p key={Math.random()} className={classnames("notification", notification.type)}>{this.props.user.notification.message}</p>
   }
   render() {
     const user = this.props.user
@@ -26,18 +32,30 @@ class Account extends Component {
     return (
       <div className="page account">
         {this.getNotification()}
-        <p>Loading...</p>
+        <div className="loadingIndicator">
+          <Dice />
+          <span className="loadingMessage">Accessing server...</span>
+        </div>
       </div>
     )
   }
   renderSignInPage() {
-    // ToDo: format buttons. Make them look recognizable through Google/Facebook logos and add a pointer cursor.
     // ToDo: add reasons why you would want an account.
     return (
       <div className="page account">
         {this.getNotification()}
-        <div className="btn" onClick={this.props.signInGoogle}>Sign in with Google</div>
-        <div className="btn" onClick={this.props.signInFacebook}>Sign in with Facebook</div>
+        <div className="signInButtons">
+          <div className="btn redirectLogin" onClick={() => this.props.signInGoogle(true)}>Google sign-in</div>
+          <div className="btn redirectLogin" onClick={() => this.props.signInFacebook(true)}>Facebook sign-in</div>
+          <div className="btn popupLogin" onClick={() => this.props.signInGoogle(false)}>Google sign-in</div>
+          <div className="btn popupLogin" onClick={() => this.props.signInFacebook(false)}>Facebook sign-in</div>
+        </div>
+        <p className="signInReasons">Signing in has various benefits.</p>
+        <ul className="signInReasonList">
+          <li>Keep track of statistics.</li>
+          <li>Share settings across devices.</li>
+          <li>Predictive mode (still under development).</li>
+        </ul>
       </div>
     )
   }
@@ -47,8 +65,11 @@ class Account extends Component {
     return (
       <div className="page account">
         {this.getNotification()}
-        <p>You are signed in as {user.name} &lt;{user.email}&gt;.</p>
-        <div className="btn" onClick={this.props.signOut}>Sign me out!</div>
+        <div className="signedInNote">
+          <span className="signedInMessage">Signed in as {user.name}.</span>
+          <div className="btn" onClick={this.props.signOut}>Sign out</div>
+        </div>
+        <p>Statistics will be visible here soon. I'm still working on that.</p>
       </div>
     )
   }
@@ -62,8 +83,8 @@ export default connect(
   },
   function mapDispatchToProps(dispatch) {
     return {
-      signInGoogle: () => dispatch(userActions.signInGoogle()),
-      signInFacebook: () => dispatch(userActions.signInFacebook()),
+      signInGoogle: (redirect) => dispatch(userActions.signInGoogle(redirect)),
+      signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
       signOut: () => dispatch(userActions.signOut()),
     }
   }

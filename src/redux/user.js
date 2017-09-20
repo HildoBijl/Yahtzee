@@ -5,8 +5,8 @@ import firebase from '../config/firebase.js'
  */
 
 const actions = {
-	signInGoogle: () => signIn(new firebase.auth.GoogleAuthProvider()),
-	signInFacebook: () => signIn(new firebase.auth.FacebookAuthProvider()),
+	signInGoogle: (redirect) => signIn(new firebase.auth.GoogleAuthProvider(), redirect),
+	signInFacebook: (redirect) => signIn(new firebase.auth.FacebookAuthProvider(), redirect),
   signOut: () => (
 		(dispatch) => {
 			firebase.auth().signOut()
@@ -26,11 +26,15 @@ const actions = {
 	}),
 }
 
-function signIn(provider) {
+function signIn(provider, redirect = false) {
 	return (dispatch) => {
-		firebase.auth().signInWithRedirect(provider)
-			.then((result) => dispatch({ type: 'RedirectSuccess', result }))
-			.catch((error) => dispatch({ type: 'RedirectError', error }))
+		if (redirect) {
+			firebase.auth().signInWithRedirect(provider)
+		} else {
+			firebase.auth().signInWithPopup(provider)
+				.then((result) => dispatch({ type: 'RedirectSuccess', result }))
+				.catch((error) => dispatch({ type: 'RedirectError', error }))
+		}
 	}
 }
 
@@ -46,8 +50,11 @@ export function reducer(user = {ready: false}, action) {
     case 'SignOut': {
       return {
 				ready: true, 
-				notification: 'You have been signed out.',
-				notificationAt: new Date(),
+				notification: {
+					message: 'You have been signed out.',
+					date: new Date(),
+					type: 'info',
+				},
 			}
     }
 
@@ -58,7 +65,6 @@ export function reducer(user = {ready: false}, action) {
 				return {
 					ready: true,
 					notification: user.notification,
-					notificationAt: new Date(),
 				}
 			
 			// The user signed in.
@@ -67,6 +73,7 @@ export function reducer(user = {ready: false}, action) {
 				name: firebaseUser.displayName,
 				email: firebaseUser.email,
 				uid: firebaseUser.uid,
+				notification: user.notification,
 			}
 		}
 		
@@ -78,8 +85,11 @@ export function reducer(user = {ready: false}, action) {
 			// Notify the user that the sign-in was successful.
 			return {
 				...user,
-				notification: 'You have been signed in.',
-				notificationAt: new Date(),
+				notification: {
+					message: 'You have been signed in.',
+					date: new Date(),
+					type: 'info',
+				},
 			}
 		}
 
@@ -94,8 +104,11 @@ export function reducer(user = {ready: false}, action) {
 
 			return {
 				...user,
-				notification: message + ' ' + error.message,
-				notificationAt: new Date(),
+				notification: {
+					message: message,
+					type: 'error',
+					date: new Date(),
+				},
 			}
 		}
 

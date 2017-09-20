@@ -49,16 +49,17 @@ class RollBoard extends Component {
 
     return (
       <div className={classnames("rollBoard", "selected" + getNumSelectedDice(gs))}>
-        <ul className="diceContainer">
+        <div className="diceContainer">
           {gs.dice.map((d,ind) => {
             return (
               <Dice
                 key={ind}
                 index={ind}
+                fromState={true}
               />
             )}
           )}
-        </ul>
+        </div>
         <div className="keepBar"></div>
         <span className="btn rollButton" onClick={this.rollDice.bind(this)} disabled={!enableRollButton(gs)}>Roll dice</span>
         <span className={classnames(
