@@ -22,7 +22,7 @@ class Account extends Component {
     return this.renderAccountPage()
   }
   renderNotReadyPage() {
-    // ToDo: set up a proper 
+    // ToDo: set up a proper loading indicator.
     return (
       <div className="page account">
         {this.getNotification()}
@@ -31,7 +31,7 @@ class Account extends Component {
     )
   }
   renderSignInPage() {
-    // ToDo: format buttons.
+    // ToDo: format buttons. Make them look recognizable through Google/Facebook logos and add a pointer cursor.
     // ToDo: add reasons why you would want an account.
     return (
       <div className="page account">
