@@ -2,8 +2,8 @@ import './Main.css'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Fragment } from 'redux-little-router';
-import Helmet from 'react-helmet';
+import { Fragment } from 'redux-little-router'
+import Helmet from 'react-helmet'
 
 import { isGameFinished } from '../../../redux/gameState.js'
 

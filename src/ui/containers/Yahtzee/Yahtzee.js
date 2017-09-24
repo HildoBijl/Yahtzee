@@ -2,6 +2,7 @@ import './Yahtzee.css'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { replace } from 'redux-little-router'
 
 import gameActions from '../../../redux/gameState.js'
 import { canClickOnField, canClickOnDice, canRollDice, isGameFinished } from '../../../redux/gameState.js'
@@ -12,6 +13,11 @@ import ScoreCard from '../../components/ScoreCard/ScoreCard.js'
 
 class Yahtzee extends Component {
   componentDidMount() {
+    // If no valid URL was given, go to the main page.
+    if (!this.props.router.result)
+      this.props.goToHome()
+
+    // Perform other initializations.
     document.onkeydown = this.handleKeyPress.bind(this)
     this.props.loadSolution()
   }
@@ -19,6 +25,10 @@ class Yahtzee extends Component {
   // handleKeyPress is called when a key is pressed. It figures out whether something needs to be done and, if so, makes the appropriate calls.
   handleKeyPress(event) {
     const gs = this.props.gameState
+
+    // If we're not on the rollboard, disable hotkeys.
+    if (!this.props.router.result || this.props.router.result.page !== 'Main')
+      return
 
     // Is it an enter or space?
     if (event.key === ' ' || event.key === 'Enter') {
@@ -99,6 +109,7 @@ export default connect(
   function mapStateToProps(state) {
     return {
       gameState: state.gameState,
+      router: state.router,
     }
   },
   function mapDispatchToProps(dispatch) {
@@ -108,6 +119,7 @@ export default connect(
       pressNumber: (number) => dispatch(gameActions.pressNumber(number)),
       resetGame: () => dispatch(gameActions.resetGame()),
       loadSolution: () => dispatch(gameActions.loadSolution()),
+      goToHome: () => dispatch(replace('/'))
     }
   }
 )(Yahtzee)

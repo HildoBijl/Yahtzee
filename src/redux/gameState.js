@@ -1,4 +1,6 @@
 import yana from '../logic/yahtzeeAnalysis.js'
+import firebase from '../config/firebase.js'
+import { isSignedIn } from './user.js'
 
 /*
  * First, set up the actions changing things.
@@ -13,13 +15,19 @@ const actions = {
     type: 'PressNumber',
     number,
   }),
-  clickField: (index) => ({
-    type: 'ClickField',
-    index,
-  }),
-  rollDice: () => ({
-    type: 'RollDice',
-  }),
+  clickField: (index) => (
+    (dispatch, getState) => dispatch({
+      type: 'ClickField',
+      index,
+      user: getState().user,
+    })
+  ),
+  rollDice: () => (
+    (dispatch, getState) => dispatch({
+      type: 'RollDice',
+      user: getState().user,
+    })
+  ),
   resetGame: () => ({
     type: 'ResetGame',
   }),
@@ -39,6 +47,7 @@ export function reducer(gs = newGameState(), action) {
   switch (action.type) {
 
     case 'ClickDice': {
+      console.log(action)
       if (!canClickOnDice(gs))
         throw new Error('Cannot select/deselect dice at this moment.')
 
@@ -100,10 +109,16 @@ export function reducer(gs = newGameState(), action) {
         selectedField: (isFieldSelected(gs, action.index) ? -1 : action.index)
       }
 
-      // If this was the last field, finish the game.
+      // If this was the last field, finish the game and send the result to Firebase for storage.
       if (getNumRemainingFields(gs) === 0) {
         gs = applyFieldSelection(gs)
-        // TODO: SAVE THE GAME TO FIREBASE.
+        if (isSignedIn(action.user) && gs.historyKey) {
+          firebase.database().ref('games/' + action.user.uid + '/' + gs.historyKey).update({
+            process: gs.history,
+            end: firebase.database.ServerValue.TIMESTAMP,
+            score: getGameScore(gs),
+          })
+        }
       }
       return gs
     }
@@ -133,6 +148,38 @@ export function reducer(gs = newGameState(), action) {
         }, 0)
       })
 
+      // Update the history, first storing the choice (if any) and then storing the new roll.
+      const history = gs.history.slice(0)
+      if (gs.rollsLeft === yana.numRolls) {
+        // We are starting a new turn. We need to add another turn to the history array.
+        history.push([])
+      } else {
+        // We are continuing a turn. Add the dice selection as choice.
+        const turn = history.pop().slice(0)
+        turn[turn.length - 1].choice = newOrder.reduce((res,v,i) => {
+          res[v] = gs.selectedDice[i]
+          return res
+        }, [])
+        history.push(turn)
+      }
+      const turn = history.pop().slice(0)
+      turn.push({ roll: newOrder.reduce((res,v,i) => {
+        res[v] = newDice[i]
+        return res
+      }, []) })
+      history.push(turn)
+
+      // Update the history on Firebase as well. Only do so if there is a historyKey already or if the game is just starting. This ensures that games in which a user logs in halfway through the match are not counted.
+      let historyKey = gs.historyKey
+      if (isSignedIn(action.user) && (historyKey || isGameJustStarting(gs))) {
+        let update = { process: history }
+        if (!historyKey) {
+          historyKey = firebase.database().ref().child('games/' + action.user.uid).push().key
+          update.start = firebase.database.ServerValue.TIMESTAMP
+        }
+        firebase.database().ref('games/' + action.user.uid + '/' + historyKey).update(update)
+      }
+
       // Set up the new state, including other settings.
       return {
         ...gs,
@@ -141,6 +188,8 @@ export function reducer(gs = newGameState(), action) {
         rollsLeft: gs.rollsLeft - 1,
         lastRollAt: new Date(),
         expectedScoreBeforeRoll,
+        history,
+        historyKey,
       }
     }
 
@@ -175,6 +224,8 @@ function newGameState(solutionAvailable = false) {
     selectedField: -1,
     solutionAvailable: solutionAvailable,
     expectedScoreBeforeRoll: -1,
+    history: [],
+    historyKey: undefined,
   }
 }
 
@@ -188,6 +239,12 @@ function applyFieldSelection(gs) {
   let scores = gs.scores.slice(0)
   scores[gs.selectedField] = yana.fieldScore(gs.selectedField, sortedDice)
 
+  // Update the history.
+  const history = gs.history.slice(0)
+  const turn = history.pop().slice(0)
+  turn[turn.length-1].choice = gs.selectedField
+  history.push(turn)
+
   // Update and return the state. We also update the lastAnalysis parameter, since obviously the simplified state has changed.
   return updateLastAnalysis({
     ...gs,
@@ -196,6 +253,7 @@ function applyFieldSelection(gs) {
     selectedDice: new Array(yana.numDice).fill(false),
     rollsLeft: yana.numRolls,
     selectedField: -1,
+    history,
   })
 }
 

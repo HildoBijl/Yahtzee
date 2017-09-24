@@ -4,20 +4,65 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
+import firebase from '../../../config/firebase.js'
 import userActions from '../../../redux/user.js'
+import statisticsActions from '../../../redux/statistics.js'
 import { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
+import { roundToDigits } from '../../../logic/util.js'
 
 import Dice from '../../components/Dice/Dice.js'
 
 const hideNotificationAfter = 6000
 
 class Account extends Component {
+
+  // Manage the listeners for the statistics.
+  componentDidMount() {
+    if (isSignedIn(this.props.user))
+      this.startListeningForStatisticUpdates()
+  }
+  componentDidUpdate(prevProps) {
+    // If the user signs in, start listening to updates from the datastore about the amount of games he has played. If he signs out, stop listening.
+    if (!isSignedIn(prevProps.user) && isSignedIn(this.props.user))
+      this.startListeningForStatisticUpdates()
+    if (isSignedIn(prevProps.user) && !isSignedIn(this.props.user))
+      this.stopListeningForStatisticUpdates()
+  }
+  componentWillUnmount() {
+    console.log('Stop listening')
+    this.stopListeningForStatisticUpdates()
+  }
+  
+  // Manage handlers for the statistics.
+  startListeningForStatisticUpdates() {
+    console.log('Start listening')
+    this.firebaseRef = firebase.database().ref('games/' + this.props.user.uid)
+    this.firebaseRef.on('value', this.props.statisticsLoaded)
+  }
+  stopListeningForStatisticUpdates() {
+    if (this.firebaseRef)
+      this.firebaseRef.off()
+  }
+
+  // The following functions are about rendering stuff.
   getNotification() {
-    // Check if there is a valid notification.
+    // Check if a notification exists.
     const notification = this.props.user.notification
-    if (!notification || new Date() - notification.date > hideNotificationAfter)
-      return ''
-    return <p key={Math.random()} className={classnames("notification", notification.type)}>{this.props.user.notification.message}</p>
+    if (notification) {
+      // Hide the notification when necessary.
+      const timeUntilHide = hideNotificationAfter - (new Date() - notification.date)
+      if (timeUntilHide > 0)
+        setTimeout(this.forceUpdate.bind(this), timeUntilHide)
+
+      // Give the notification HTML.
+      return <p className={classnames(
+        "notification",
+        notification.type,
+        { "hidden": timeUntilHide <= 0 }
+      )}>{notification.message}</p>
+    } else {
+      return <p className="notification hidden"></p>
+    }
   }
   render() {
     const user = this.props.user
@@ -28,7 +73,6 @@ class Account extends Component {
     return this.renderAccountPage()
   }
   renderNotReadyPage() {
-    // ToDo: set up a proper loading indicator.
     return (
       <div className="page account">
         {this.getNotification()}
@@ -40,7 +84,6 @@ class Account extends Component {
     )
   }
   renderSignInPage() {
-    // ToDo: add reasons why you would want an account.
     return (
       <div className="page account">
         {this.getNotification()}
@@ -60,8 +103,9 @@ class Account extends Component {
     )
   }
   renderAccountPage() {
-    // ToDo: add statistics.
+    // ToDo: add nice statistics graphs.
     const user = this.props.user
+    const statistics = this.props.statistics
     return (
       <div className="page account">
         {this.getNotification()}
@@ -69,7 +113,15 @@ class Account extends Component {
           <span className="signedInMessage">Signed in as {user.name}.</span>
           <div className="btn" onClick={this.props.signOut}>Sign out</div>
         </div>
-        <p>Statistics will be visible here soon. I'm still working on that.</p>
+        {statistics.loaded ? 
+          <ul>
+            <li>Games played: <strong>{statistics.games.length}</strong></li>
+            <li>Games finished: <strong>{statistics.gamesFinished}</strong></li>
+            <li>Average score: <strong>{roundToDigits(statistics.averageScore, 1)}</strong></li>
+          </ul>
+        :
+          <p>Loading your statistics...</p>
+        }
       </div>
     )
   }
@@ -79,6 +131,7 @@ export default connect(
   function mapStateToProps(state) {
     return {
       user: state.user,
+      statistics: state.statistics,
     }
   },
   function mapDispatchToProps(dispatch) {
@@ -86,6 +139,7 @@ export default connect(
       signInGoogle: (redirect) => dispatch(userActions.signInGoogle(redirect)),
       signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
       signOut: () => dispatch(userActions.signOut()),
+      statisticsLoaded: (snapshot) => dispatch(statisticsActions.statisticsLoaded(snapshot)),
     }
   }
 )(Account)
