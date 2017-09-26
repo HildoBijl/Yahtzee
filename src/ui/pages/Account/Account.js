@@ -29,13 +29,11 @@ class Account extends Component {
       this.stopListeningForStatisticUpdates()
   }
   componentWillUnmount() {
-    console.log('Stop listening')
     this.stopListeningForStatisticUpdates()
   }
   
   // Manage handlers for the statistics.
   startListeningForStatisticUpdates() {
-    console.log('Start listening')
     this.firebaseRef = firebase.database().ref('games/' + this.props.user.uid)
     this.firebaseRef.on('value', this.props.statisticsLoaded)
   }
@@ -110,14 +108,18 @@ class Account extends Component {
       <div className="page account">
         {this.getNotification()}
         <div className="signedInNote">
-          <span className="signedInMessage">Signed in as {user.name}.</span>
+          <div className="signedInID">
+            <span className="signedInMessage">Signed in as <strong>{user.name}</strong>. &lt;{user.email}&gt;</span>
+          </div>
           <div className="btn" onClick={this.props.signOut}>Sign out</div>
         </div>
         {statistics.loaded ? 
           <ul>
             <li>Games played: <strong>{statistics.games.length}</strong></li>
             <li>Games finished: <strong>{statistics.gamesFinished}</strong></li>
-            <li>Average score: <strong>{roundToDigits(statistics.averageScore, 1)}</strong></li>
+            {statistics.gamesFinished > 0 ? <li>Average score: <strong>{roundToDigits(statistics.averageScore, 1)}</strong></li> : ''}
+            {statistics.gamesFinished > 0 ? <li>Best score: <strong>{statistics.bestScore}</strong></li> : ''}
+            {statistics.gamesFinished > 0 ? <li>Worst score: <strong>{statistics.worstScore}</strong></li> : ''}
           </ul>
         :
           <p>Loading your statistics...</p>

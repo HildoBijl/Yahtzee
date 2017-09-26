@@ -40,11 +40,12 @@ export function reducer(statistics = getDefaultState(), action) {
           totalScore+= game.score
         }
       }
-      const averageScore = gamesFinished === 0 ? 0 : totalScore/gamesFinished
       return {
         games,
         gamesFinished,
-        averageScore,
+        averageScore: gamesFinished === 0 ? 0 : totalScore/gamesFinished,
+        bestScore: games.reduce((max,game) => game.end ? Math.max(max,game.score) : max, Number.MIN_VALUE),
+        worstScore: games.reduce((min,game) => game.end ? Math.min(min,game.score) : min, Number.MAX_VALUE),
         loaded: true,
       }
     }
