@@ -10,36 +10,24 @@ body.body { // Add class to be more important than bootstrap.
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 10/7;
-}
 
-@media @phonePortrait {
-  body {
-    padding: 10px 0px;
-  }
-
-  .container {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
-}
-
-@media @phoneLandscape {
-  body {
+  padding: 10px 0px; // phonePortrait
+  @media @phoneLandscape {
     padding: 15px 0px;
   }
+  @media @desktop {
+    padding: 20px 0px;
+  }
+}
 
-  .container {
+.container {
+  padding-left: 5px;
+  padding-right: 5px;
+  @media @phoneLandscape {
     padding-left: 10px;
     padding-right: 10px;
   }
-}
-
-@media @desktop {
-  body {
-    padding: 20px 0px;
-  }
-
-  .container {
+  @media @desktop {
     padding-left: 15px;
     padding-right: 15px;
   }

@@ -14,10 +14,10 @@ const defaultBounds = [150, 300] // These are the default bounds of the horizont
 const binSizeIndex = 2000 // If you want larger bins in the statistics plot, increase this number.
 const plotWidth = 400 // The width (within the SVG coordinate set) of the plot.
 const plotHeight = 300 // The height of the plot.
-const plotMargin = {top: 5, right: 15, bottom: 25, left: 20} // The margins we use on each side of the SVG plot. Note that on the left and bottom is an axis.
+const plotMargin = {top: 5, right: 10, bottom: 20, left: 20} // The margins we use on each side of the SVG plot. Note that on the left and bottom is an axis.
 
 class ScorePlot extends Component {
-
+	// Lifecycle functions.
 	componentDidMount() {
 		this.initializePlot()
 		this.updatePlot()
@@ -26,10 +26,10 @@ class ScorePlot extends Component {
 		this.updatePlot()
 	}
 
+	// Plot management functions.
 	initializePlot() {
 		this.svgContainer = select('#scorePlot')
 			.append('g')
-			.attr("filter", "url(#plotShadow)")
 		this.barContainer = this.svgContainer.append('g')
 		this.xAxisContainer = this.svgContainer.append('g')
 			.attr('transform', `translate(0,${plotHeight - plotMargin.bottom})`)
@@ -81,7 +81,7 @@ class ScorePlot extends Component {
 		this.yAxisContainer.call(yAxis)
 	}
 
-	// Calculate the bounds which the histogram should have.
+	// Calculation functions for the plot.
 	getScoreBounds() {
 		// If we don't have any games yet, we return the default bounds.
 		const stat = this.props.statistics
@@ -95,7 +95,6 @@ class ScorePlot extends Component {
 		scoreBounds[1] = scoreBounds[1] + ((-scoreBounds[1] % 20) + 20) % 20
 		return scoreBounds
 	}
-	// Find an appropriate bin size for the histogram.
 	getBinSize(scoreBounds) {
 		const desiredBinSize = binSizeIndex / (scoreBounds[1] - scoreBounds[0])
 		const options = [25, 10, 5, 2, 1]
@@ -107,11 +106,7 @@ class ScorePlot extends Component {
 
 	render() {
 		return (
-			<svg id="scorePlot" viewBox={`0 0 ${plotWidth} ${plotHeight}`}>
-				<filter id="plotShadow">
-					<feDropShadow dx="4" dy="4" stdDeviation="2" floodOpacity="0.9"/>
-				</filter>
-			</svg>
+			<svg id="scorePlot" viewBox={`0 0 ${plotWidth} ${plotHeight}`} />
 		)
 	}
 }

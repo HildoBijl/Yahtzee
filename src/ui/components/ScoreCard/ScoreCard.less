@@ -3,6 +3,17 @@
 .scoreCard {
   display: flex;
   flex-direction: column;
+  
+  margin: 8px auto 0px auto; // phonePortrait
+  width: 330px; // phonePortrait
+  @media @phoneLandscape {
+    margin: 0px 0px 0px 10px;
+    width: 270px;
+  }
+  @media @desktop {
+    margin: 0px 0px 0px 15px;
+    width: 330px;
+  }
 
   .columnContainer {
     display: flex;
@@ -35,6 +46,23 @@
     flex-flow: row nowrap;
     line-height: 1;
     width: 100%;
+    
+    font-size: 13px; // phonePortrait
+    height: 29px;
+    margin-bottom: 4px;
+    padding: 0px 6px;
+    @media @phoneLandscape {
+      font-size: 13px;
+      height: 30px;
+      margin-bottom: 4px;
+      padding: 0px 6px;
+    }
+    @media @desktop {
+      font-size: 14px;
+      height: 35px;
+      margin-bottom: 6px;
+      padding: 0px 8px;
+    }
 
     &.field {
       background: @canvasColor;
@@ -79,58 +107,12 @@
     }
     div:last-child {
       text-align: center;
-    }
-  }
-}
-
-@media @phonePortrait {
-  .scoreCard {
-    margin: 8px auto 0px auto;
-    width: 330px;
-    
-    .entry {
-      font-size: 13px;
-      height: 29px;
-      margin-bottom: 4px;
-      padding: 0px 6px;
-
-      div:last-child {
-        width: 30px;
-      }
-    }
-  }
-}
-
-@media @phoneLandscape {
-  .scoreCard {
-    margin: 0px 0px 0px 10px;
-    width: 270px;
-
-    .entry {
-      font-size: 13px;
-      height: 30px;
-      margin-bottom: 4px;
-      padding: 0px 6px;
-
-      div:last-child {
+      
+      width: 30px; // phonePortrait
+      @media @phoneLandscape {
         width: 20px;
       }
-    }
-  }
-}
-
-@media @desktop {
-  .scoreCard {
-    margin: 0px 0px 0px 15px;
-    width: 330px;
-    
-    .entry {
-      font-size: 14px;
-      height: 35px;
-      margin-bottom: 6px;
-      padding: 0px 8px;
-      
-      div:last-child {
+      @media @desktop {
         width: 40px;
       }
     }

@@ -95,22 +95,18 @@
 	.gamesToShow:not(:last-child) {
 		margin: 0 0 20px 0;
 	}
-}
-
-@media @phone {
+	
+	// Phones use redirect logins, while desktops use popup logins.
 	.redirectLogin {
 		display: block;
+		@media @desktop {
+			display: none;
+		}
 	}
 	.popupLogin {
 		display: none;
-	}
-}
-
-@media @desktop {
-	.redirectLogin {
-		display: none;
-	}
-	.popupLogin {
-		display: block;
+		@media @desktop {
+			display: block;
+		}
 	}
 }

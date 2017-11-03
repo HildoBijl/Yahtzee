@@ -1,8 +1,16 @@
 @import '../../params.less';
 
+@keepBarTopPhone: 140px;
+@keepBarTopDesktop: 168px;
+
 // General RollBoard style.
 .rollBoard {
   position: relative;
+
+  height: 262px;
+  @media @desktop {
+    height: 314px;
+  }
 
   .keepBar {
     background-color: 1.5*@bgColor;
@@ -16,6 +24,15 @@
     left: 50%;
     position: absolute;
     transform: translate(-50%, 0);
+
+    height: 110px;
+    top: @keepBarTopPhone;
+    width: ~"calc(100% - 20px)";
+    @media @desktop {
+      height: 126px;
+      top: @keepBarTopDesktop;
+      width: ~"calc(100% - 40px)";
+    }
 
     &::after {
       content: "Keep";
@@ -45,7 +62,6 @@
     transform: translate(-50%, 0);
     position: absolute;
   }
-
   .choiceFeedback, .luckFeedback {
     padding: 7px;
     position: absolute;
@@ -56,69 +72,34 @@
   .luckFeedback {
     right: 16px;
   }
-}
-
-// Positioning style for phones.
-@media @phone {
-  @keepBarTop: 140px;
-
-  .rollBoard {
-    height: 262px;
-
-    .keepBar {
-      height: 110px;
-      top: @keepBarTop;
-      width: ~"calc(100% - 20px)";
+  .rollButton, .choiceFeedback, .luckFeedback {
+    top: @keepBarTopPhone - 46px;
+    @media @desktop {
+      top: @keepBarTopDesktop - 46px;
     }
-
-    .rollButton, .choiceFeedback, .luckFeedback {
-      top: @keepBarTop - 46px;
-    }
-
-    // Give the dice the correct top-coordinate.
-    .dice.unselected {
-      top: 20px;
-    }
-    .dice.selected {
-      top: @keepBarTop + 40px;
-    }
-
-    // Give the dice the correct left-coordinate.
-    .leftCoordinateStyle(12px, @diceSizeSmall);
   }
-}
 
-// Positioning style for larger screens.
-@media @desktop {
-  @keepBarTop: 168px;
-
-  .rollBoard {
-    height: 314px;
-
-    .keepBar {
-      height: 126px;
-      top: @keepBarTop;
-      width: ~"calc(100% - 40px)";
-    }
-
-    .rollButton, .choiceFeedback, .luckFeedback {
-      top: @keepBarTop - 46px;
-    }
-
-    // Give the dice the correct top-coordinate.
-    .dice.unselected {
+  // Give the dice the correct top-coordinate.
+  .dice.unselected {
+    top: 20px;
+    @media @desktop {
       top: 30px;
     }
-    .dice.selected {
-      top: @keepBarTop + 44px;
+  }
+  .dice.selected {
+    top: @keepBarTopPhone + 40px;
+    @media @desktop {
+      top: @keepBarTopDesktop + 44px;
     }
-
-    // Give the dice the correct left-coordinate.
+  }
+  
+  .leftCoordinateStyle(12px, @diceSizeSmall);
+  @media @desktop {
     .leftCoordinateStyle(24px, @diceSizeLarge);
   }
 }
 
-// And here is the mixin for generating the correct style for the left-coordinate.
+// And here is the mixin for generating the correct style for the left-coordinate of the dice.
 .leftCoordinateStyle(@diceSeparation, @diceSize) {
   // Loop through all the numbers of dice (5,4,3,2,1,0) that may have been selected.
   .selectedLoop (@numSelected) when (@numSelected >= 0) {
