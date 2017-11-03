@@ -20,6 +20,7 @@ const actions = {
       type: 'ClickField',
       index,
       user: getState().user,
+      gameState: getState().gameState,
     })
   ),
   rollDice: () => (
@@ -103,22 +104,17 @@ export function reducer(gs = newGameState(), action) {
       if (!canClickOnField(gs, action.index))
         throw new Error('Cannot select/deselect field "' + action.index + '" at this moment.')
 
-      // Update the state.
-      gs = {
-        ...gs,
-        selectedField: (isFieldSelected(gs, action.index) ? -1 : action.index)
-      }
+      // Apply the selection to the game state.
+      gs = selectField(gs, action.index)
 
       // If this was the last field, finish the game and send the result to Firebase for storage.
-      if (getNumRemainingFields(gs) === 0) {
-        gs = applyFieldSelection(gs)
-        if (isSignedIn(action.user) && gs.historyKey) {
-          firebase.database().ref('games/' + action.user.uid + '/' + gs.historyKey).update({
-            process: gs.history,
-            end: firebase.database.ServerValue.TIMESTAMP,
-            score: getGameScore(gs),
-          })
-        }
+      if (getNumRemainingFields(gs) === 0 && isSignedIn(action.user) && gs.canSaveGame && gs.historyKey) {
+        firebase.database().ref('games/' + action.user.uid + '/' + gs.historyKey).update({
+          process: gs.history,
+          end: firebase.database.ServerValue.TIMESTAMP,
+          score: getGameScore(gs),
+        })
+        // TODO: ADD POSSIBLE LUCK AND SKILL STATS.
       }
       return gs
     }
@@ -169,9 +165,9 @@ export function reducer(gs = newGameState(), action) {
       }, []) })
       history.push(turn)
 
-      // Update the history on Firebase as well. Only do so if there is a historyKey already or if the game is just starting. This ensures that games in which a user logs in halfway through the match are not counted.
+      // Update the history on Firebase as well. Only do so if we have noted that we can save this game. If the user manually logs in halfway through the match, then this will be set to false and we won't save the game.
       let historyKey = gs.historyKey
-      if (isSignedIn(action.user) && (historyKey || isGameJustStarting(gs))) {
+      if (isSignedIn(action.user) && gs.canSaveGame) {
         let update = { process: history }
         if (!historyKey) {
           historyKey = firebase.database().ref().child('games/' + action.user.uid).push().key
@@ -207,6 +203,18 @@ export function reducer(gs = newGameState(), action) {
       })
     }
 
+    case 'RedirectSuccess': {
+      // This is called when the user logged in. First we check if it was an automatic log-in.
+      if (!action.result.user)
+        return gs
+      
+      // The user logged in manually. We will then not save his game.
+      return {
+        ...gs,
+        canSaveGame: false,
+      }
+    }
+
     default: {
       return gs
     }
@@ -226,7 +234,22 @@ function newGameState(solutionAvailable = false) {
     expectedScoreBeforeRoll: -1,
     history: [],
     historyKey: undefined,
+    canSaveGame: true,
   }
+}
+
+export function selectField(gs, field) {
+  // Update the state.
+  gs = {
+    ...gs,
+    selectedField: (isFieldSelected(gs, field) ? -1 : field)
+  }
+
+  // If this was the last field, immediately apply the selection too.
+  if (getNumRemainingFields(gs) === 0) {
+    gs = applyFieldSelection(gs)
+  }
+  return gs
 }
 
 function applyFieldSelection(gs) {

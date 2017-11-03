@@ -68,6 +68,33 @@
 			min-width: 74px;
 		}
 	}
+
+	#scoreLists {
+		align-items: flex-start;
+		display: flex;
+		flex-flow: row nowrap;
+		margin: 6px 0 12px 0;
+
+		ul {
+			list-style: none;
+			width: 50%;
+
+			&:first-child {
+				width: 56%;
+			}
+			&:last-child {
+				width: 44%;
+			}
+
+			li {
+				margin: 6px 0;
+			}
+		}
+	}
+
+	.gamesToShow:not(:last-child) {
+		margin: 0 0 20px 0;
+	}
 }
 
 @media @phone {

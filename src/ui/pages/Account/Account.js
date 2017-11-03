@@ -3,6 +3,7 @@ import './Account.css'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
+import dateformat from 'dateformat'
 
 import firebase from '../../../config/firebase.js'
 import userActions from '../../../redux/user.js'
@@ -11,6 +12,7 @@ import { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
 import { roundToDigits } from '../../../logic/util.js'
 
 import Dice from '../../components/Dice/Dice.js'
+import ScorePlot from '../../components/ScorePlot/ScorePlot.js'
 
 const hideNotificationAfter = 6000
 
@@ -62,6 +64,11 @@ class Account extends Component {
       return <p className="notification hidden"></p>
     }
   }
+
+  setStatisticsBounds(bounds) {
+    this.props.setStatisticsBounds(bounds)
+  }
+
   render() {
     const user = this.props.user
     if (!isFirebaseReady(user))
@@ -101,7 +108,6 @@ class Account extends Component {
     )
   }
   renderAccountPage() {
-    // ToDo: add nice statistics graphs.
     const user = this.props.user
     const statistics = this.props.statistics
     return (
@@ -113,19 +119,66 @@ class Account extends Component {
           </div>
           <div className="btn" onClick={this.props.signOut}>Sign out</div>
         </div>
-        {statistics.loaded ? 
-          <ul>
-            <li>Games played: <strong>{statistics.games.length}</strong></li>
-            <li>Games finished: <strong>{statistics.gamesFinished}</strong></li>
-            {statistics.gamesFinished > 0 ? <li>Average score: <strong>{roundToDigits(statistics.averageScore, 1)}</strong></li> : ''}
-            {statistics.gamesFinished > 0 ? <li>Best score: <strong>{statistics.bestScore}</strong></li> : ''}
-            {statistics.gamesFinished > 0 ? <li>Worst score: <strong>{statistics.worstScore}</strong></li> : ''}
-          </ul>
-        :
+        {!statistics.loaded ? 
           <p>Loading your statistics...</p>
+        :
+          <div>
+            {this.showOverallStats()}
+            <ScorePlot />
+            {this.showGames()}
+            {this.showUnfinishedGames()}
+          </div>
         }
       </div>
     )
+  }
+  showOverallStats() {
+    const statistics = this.props.statistics
+    return (
+      <div id="scoreLists">
+        <ul>
+          <li>Games played: <strong>{statistics.gamesFinished}</strong></li>
+          <li>Average score: <strong>{statistics.gamesFinished > 0 ? roundToDigits(statistics.averageScore, 1) : '-'}</strong></li>
+        </ul>
+        <ul>
+          <li>Best: <strong>{statistics.gamesFinished > 0 ? statistics.bestScore : '-'}</strong></li>
+          <li>Worst: <strong>{statistics.gamesFinished > 0 ? statistics.worstScore : '-'}</strong></li>
+        </ul>
+      </div>
+    )
+  }
+  showGames() {
+    const stat = this.props.statistics
+    if (!stat.bounds)
+      return ''
+    const [min, max] = stat.bounds
+    const games = stat.games.filter(game => game.score >= min && game.score < max)
+    window.g = games // TODO: REMOVE THIS LINE.
+    return (
+      <div id="finishedGames" className="gamesToShow">
+        <h2>Scores from {min} to {max}</h2>
+        <ul>
+          {games.map((game,i) => {
+            return <li key={i}><strong>{game.score}</strong> on {dateformat(game.end, 'ddd, mmmm dS, yyyy, H:MM')}</li>
+          })}
+        </ul>
+      </div>
+    )
+    // TODO: IMPLEMENT INSPECTING FINISHED GAMES.
+  }
+  showUnfinishedGames() {
+    const statistics = this.props.statistics
+    const numUnfinishedGames = statistics.games.length - statistics.gamesFinished
+    if (numUnfinishedGames === 0)
+      return ''
+    return ''
+    // return (
+    //   <div id="unfinishedGames" className="gamesToShow">
+    //     <h2>Unfinished games</h2>
+    //     <p>You still have <strong>{statistics.games.length - statistics.gamesFinished}</strong> unfinished games. In a later version of this game, you'll be able to finish those too.</p>
+    //   </div>
+    // )
+    // TODO: IMPLEMENT FINISHING UNFINISHED GAMES.
   }
 }
 
@@ -142,6 +195,7 @@ export default connect(
       signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
       signOut: () => dispatch(userActions.signOut()),
       statisticsLoaded: (snapshot) => dispatch(statisticsActions.statisticsLoaded(snapshot)),
+      setStatisticsBounds: (bounds) => dispatch(statisticsActions.setStatisticsBounds(bounds)),
     }
   }
 )(Account)

@@ -61,11 +61,12 @@ export function reducer(user = {ready: false}, action) {
     case 'AuthStateChange': {
 			// Check if the user signed out. If so, delete the user but keep any potential notification.
 			const firebaseUser = firebase.auth().currentUser
-			if (!firebaseUser)
+			if (!firebaseUser) {
 				return {
 					ready: true,
 					notification: user.notification,
 				}
+			}
 			
 			// The user signed in.
 			return {

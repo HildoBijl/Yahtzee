@@ -1,0 +1,29 @@
+@import '../../params.less';
+
+#scorePlot {
+	margin: 12px 0;
+	width: 100%;
+
+	rect {
+		cursor: pointer;
+		fill: 0.8*@keepBarColor;
+		stroke: #fff;
+		stroke-width: 0.4;
+
+		&:hover {
+			fill: 1.2*@keepBarColor;
+		}
+	}
+
+	.domain {
+		stroke: #fff;
+	}
+	.tick {
+		line {
+			stroke: #fff;
+		}
+		text {
+			fill: #fff;
+		}
+	}
+}
