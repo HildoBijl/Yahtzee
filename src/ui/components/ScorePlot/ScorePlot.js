@@ -7,6 +7,7 @@ import { histogram, min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
 import { axisLeft, axisBottom } from 'd3-axis'
 import { transition } from 'd3-transition'
+import tip from 'd3-tip'
 
 import statisticsActions from '../../../redux/statistics.js'
 
@@ -28,6 +29,7 @@ class ScorePlot extends Component {
 
 	// Plot management functions.
 	initializePlot() {
+		// Set up all containers.
 		this.svgContainer = select('#scorePlot')
 			.append('g')
 		this.barContainer = this.svgContainer.append('g')
@@ -35,6 +37,19 @@ class ScorePlot extends Component {
 			.attr('transform', `translate(0,${plotHeight - plotMargin.bottom})`)
 		this.yAxisContainer = this.svgContainer.append('g')
 			.attr('transform', `translate(${plotMargin.left},0)`)
+
+		// Initialize tooltips.
+		this.tip = tip()
+			.attr('class', 'd3-tip')
+			.direction('n')
+			.offset([-14, 0])
+			.html(games => `
+				<div class="scorePlotTip">
+					<span class="games">${games.length} games</span>
+					<span class="scores">with scores between ${games.x0} and ${games.x1-1}</span>
+				</div>`)
+		this.svgContainer.call(this.tip)
+		window.t = this.tip
 	}
 	updatePlot() {
 		// Calculate the bin size.
@@ -66,6 +81,8 @@ class ScorePlot extends Component {
 			.append('rect')
 			.attr("height", 0) // Set the initial height to zero, so we can animate the plot from this point.
 			.attr("y", yScale(0))
+			.on('mouseover', this.tip.show) // Add a tool tip.
+			.on('mouseout', this.tip.hide)
 			.on('click', (bin) => this.props.setStatisticsBounds([bin.x0, bin.x1]))
 		.merge(rects) // New and existing rectangles.
 			.attr("width", (bin,i) => xScale(binStarts[i] + binSize) - xScale(binStarts[i]))

@@ -153,10 +153,9 @@ class Account extends Component {
       return ''
     const [min, max] = stat.bounds
     const games = stat.games.filter(game => game.score >= min && game.score < max)
-    window.g = games // TODO: REMOVE THIS LINE.
     return (
       <div id="finishedGames" className="gamesToShow">
-        <h2>Scores from {min} to {max}</h2>
+        <h2>Scores from {min} to {max-1}</h2>
         <ul>
           {games.map((game,i) => {
             return <li key={i}><strong>{game.score}</strong> on {dateformat(game.end, 'ddd, mmmm dS, yyyy, H:MM')}</li>
