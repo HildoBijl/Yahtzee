@@ -73,21 +73,17 @@ class ScorePlot extends Component {
 		const yAxis = axisLeft(yScale)
 
 		// Apply the histogram to the graph, first adding new ones, updating existing ones and removing old ones.
-		const t = transition().duration(750);
 		const rects = this.barContainer
 			.selectAll('rect')
 			.data(this.hist)
 		rects.enter() // New rectangles.
 			.append('rect')
-			.attr("height", 0) // Set the initial height to zero, so we can animate the plot from this point.
-			.attr("y", yScale(0))
 			.on('mouseover', this.tip.show) // Add a tool tip.
 			.on('mouseout', this.tip.hide)
 			.on('click', (bin) => this.props.setStatisticsBounds([bin.x0, bin.x1]))
 		.merge(rects) // New and existing rectangles.
 			.attr("width", (bin,i) => xScale(binStarts[i] + binSize) - xScale(binStarts[i]))
 			.attr("x", (bin,i) => xScale(binStarts[i]))
-			.transition(t) // Only transition the properties coming after this call.
 			.attr("height", bin => yScale(0) - yScale(bin.length))
 			.attr("y", bin => yScale(bin.length))
 		rects.exit() // Outdated rectangles.
