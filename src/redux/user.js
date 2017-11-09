@@ -1,4 +1,5 @@
 import firebase from '../config/firebase.js'
+import settingActions from './settings.js'
 
 /*
  * First, set up the actions changing things.
@@ -13,9 +14,12 @@ const actions = {
 			dispatch({ type: 'SignOut' })
 		}
 	),
-	processAuthStateChange: () => ({
-		type: 'AuthStateChange',
-	}),
+	processAuthStateChange: () => (
+		(dispatch, getState) => {
+			dispatch({ type: 'AuthStateChange' }) // Process the log-in.
+			settingActions.loadFirebaseSettings()(dispatch, getState) // Load the settings of the user.
+		}
+	),
 	processRedirectSuccess: (result) => ({
 		type: 'RedirectSuccess',
 		result,

@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import gameActions from '../../../redux/gameState.js'
 import { getFieldDisplayValue, showFieldValue, isFieldTaken, canClickOnField, getNumberFieldSum, getNonNumberFieldSum, getBonus, getGameScore, showBonus } from '../../../redux/gameState.js'
+import { getSettings } from '../../../redux/settings.js'
 import yana from '../../../logic/yahtzeeAnalysis.js'
 import { createAscendingArray } from '../../../logic/util.js'
 
@@ -36,12 +37,38 @@ class ScoreCard extends Component {
     }
   }
 
+  getFieldHotkey(ind) {
+    if (ind < yana.numSides) {
+      switch(ind) {
+        case 0: return "(ctrl) 1"
+        case 1: return "(ctrl) 2"
+        case 2: return "(ctrl) 3"
+        case 3: return "(ctrl) 4"
+        case 4: return "(ctrl) 5"
+        case 5: return "(ctrl) 6"
+        default: throw new Error('Could not get the hotkey for a field with index "' + ind + '".')
+      }
+    } else {
+      switch(ind - yana.numSides) {
+        case 0: return "t"
+        case 1: return "f"
+        case 2: return "h"
+        case 3: return "s"
+        case 4: return "l"
+        case 5: return "c"
+        case 6: return "y"
+        default: throw new Error('Could not get the hotkey for a field with index "' + ind + '".')
+      }
+    }
+  }
+
   getScoreField(fieldIndex) {
     const gs = this.props.gameState
     return (
       <ScoreField
         key={fieldIndex}
         title={this.getFieldTitle(fieldIndex)}
+        hotkey={this.getFieldHotkey(fieldIndex)}
         type="field"
         value={getFieldDisplayValue(gs, fieldIndex)}
         available={!isFieldTaken(gs, fieldIndex)}
@@ -81,6 +108,7 @@ export default connect(
   function mapStateToProps(state) {
     return {
       gameState: state.gameState,
+      settings: getSettings(state.settings),
     }
   },
   function mapDispatchToProps(dispatch) {

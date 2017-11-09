@@ -8,6 +8,7 @@ import Helmet from 'react-helmet'
 import { isGameFinished } from '../../../redux/gameState.js'
 
 import Menu from '../../components/Menu/Menu.js'
+import OfflineNotification from '../../components/OfflineNotification/OfflineNotification.js'
 import RollBoard from '../../pages/RollBoard/RollBoard.js'
 import EndingScreen from '../../pages/EndingScreen/EndingScreen.js'
 import Settings from '../../pages/Settings/Settings.js'
@@ -29,6 +30,7 @@ class Main extends Component {
           <title>{title}</title>
         </Helmet>
         <Menu />
+        <OfflineNotification />
         <Fragment withConditions={router => router.pathname === '/' || !router.result}>{gamePage}</Fragment>
         <Fragment withConditions={router => router.pathname === '/settings'}><Settings /></Fragment>
         <Fragment withConditions={router => router.pathname === '/account'}><Account /></Fragment>

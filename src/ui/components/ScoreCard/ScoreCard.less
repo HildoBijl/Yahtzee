@@ -35,10 +35,7 @@
 
   .entry {
     align-items: center;
-    border-top: 2px solid 1.11*@keepBarBorder;
-    border-right: 2px solid 0.90*@keepBarBorder;
-    border-bottom: 2px solid 0.86*@keepBarBorder;
-    border-left: 2px solid 1.08*@keepBarBorder;
+    .scoreCardEntryBorder;
     border-radius: 8px;
     color: white;
     cursor: default;
@@ -101,11 +98,14 @@
       margin-bottom: 0;
     }
 
-    div:first-child {
+    div.title {
+      align-items: center;
+      display: flex;
       flex-grow: 1;
+      flex-flow: row nowrap;
       text-align: left;
     }
-    div:last-child {
+    div.score {
       text-align: center;
       
       width: 30px; // phonePortrait
@@ -115,6 +115,10 @@
       @media @desktop {
         width: 40px;
       }
+    }
+
+    .fieldHotkey {
+      margin: 0.5px 0 0px 6px;
     }
   }
 }

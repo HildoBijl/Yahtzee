@@ -4,8 +4,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 
-import gameActions from '../../../redux/gameState.js'
-import { isGameJustStarting, getNumSelectedDice, enableRollButton, canRollDice, getExpectedScoreOfRoll, getExpectedScoreOfChoice } from '../../../redux/gameState.js'
+import gameActions, { isGameJustStarting, getNumSelectedDice, enableRollButton, canRollDice, getExpectedScoreOfRoll, getExpectedScoreOfChoice } from '../../../redux/gameState.js'
 import { roundToDigits, roundToSignificantDigits } from '../../../logic/util.js'
 
 import Dice from '../../components/Dice/Dice.js'
@@ -61,7 +60,7 @@ class RollBoard extends Component {
           )}
         </div>
         <div className="keepBar"></div>
-        <span className="btn rollButton" onClick={this.rollDice.bind(this)} disabled={!enableRollButton(gs)}>Roll dice</span>
+        <span className="btn rollButton" onClick={this.rollDice.bind(this)} disabled={!enableRollButton(gs)}>Roll dice<span className="hotkey rollButtonHotkey">space/enter</span></span>
         <span className={classnames(
           "choiceFeedback",
           {"good": choiceMade && isOptimalChoice},
@@ -80,7 +79,7 @@ class RollBoard extends Component {
 export default connect(
   function mapStateToProps(state) {
     return {
-      gameState: state.gameState
+      gameState: state.gameState,
     }
   },
   function mapDispatchToProps(dispatch) {

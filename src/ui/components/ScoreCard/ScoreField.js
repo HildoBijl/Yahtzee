@@ -15,8 +15,11 @@ export default class ScoreField extends Component {
         )}
         onClick={this.props.callOnClick}
       >
-        <div>{this.props.title}</div>
-        <div>{this.props.showValue === false ? "" : this.props.value}</div>
+        <div className="title">
+          <span>{this.props.title}</span>
+          <span className="hotkey fieldHotkey">{this.props.hotkey}</span>
+        </div>
+        <div className="score">{this.props.showValue === false ? "" : this.props.value}</div>
       </div>
     )
   }

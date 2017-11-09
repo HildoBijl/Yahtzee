@@ -57,6 +57,7 @@ export function reducer(statistics = getDefaultState(), action) {
       }
     }
 
+    // When a field is clicked, and when this finishes the game, update the game statistics.
     case 'ClickField': {
       // If the statistics haven't been loaded yet, or there isn't a user in the first place, there's not much we can do.
       if (!statistics.loaded || !isSignedIn(action.user))

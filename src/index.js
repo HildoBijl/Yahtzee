@@ -1,4 +1,5 @@
 import './ui/reset.css'
+import './ui/general.css'
 
 import React from 'react'
 import ReactDOM from 'react-dom'

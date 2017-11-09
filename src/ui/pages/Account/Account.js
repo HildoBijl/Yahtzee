@@ -71,11 +71,20 @@ class Account extends Component {
 
   render() {
     const user = this.props.user
+    if (!this.props.online)
+      return this.renderNotOnlinePage()
     if (!isFirebaseReady(user))
       return this.renderNotReadyPage()
     else if (!isSignedIn(user))
       return this.renderSignInPage()
     return this.renderAccountPage()
+  }
+  renderNotOnlinePage() {
+    return (
+      <div className="page account">
+        <p className="warning notOnline">You are not online at the moment. Logging in is not possible.</p>
+      </div>
+    )
   }
   renderNotReadyPage() {
     return (
@@ -124,7 +133,7 @@ class Account extends Component {
         :
           <div>
             {this.showOverallStats()}
-            <ScorePlot />
+            {this.showScorePlot()}
             {this.showGames()}
             {this.showUnfinishedGames()}
           </div>
@@ -146,6 +155,9 @@ class Account extends Component {
         </ul>
       </div>
     )
+  }
+  showScorePlot() {
+    return <ScorePlot />
   }
   showGames() {
     const stat = this.props.statistics
@@ -186,6 +198,7 @@ export default connect(
     return {
       user: state.user,
       statistics: state.statistics,
+      online: state.status.online,
     }
   },
   function mapDispatchToProps(dispatch) {

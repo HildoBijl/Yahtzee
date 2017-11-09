@@ -2,10 +2,12 @@ import './Yahtzee.css'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import classnames from 'classnames'
 import { replace } from 'redux-little-router'
 
 import gameActions from '../../../redux/gameState.js'
 import { canClickOnField, canClickOnDice, canRollDice, isGameFinished } from '../../../redux/gameState.js'
+import settingActions, { getSettings } from '../../../redux/settings.js'
 import yana from '../../../logic/yahtzeeAnalysis.js'
 
 import Main from '../Main/Main.js'
@@ -19,44 +21,63 @@ class Yahtzee extends Component {
 
     // Perform other initializations.
     document.onkeydown = this.handleKeyPress.bind(this)
+    document.onkeyup = this.handleKeyUp.bind(this)
     this.props.loadSolution()
   }
 
   // handleKeyPress is called when a key is pressed. It figures out whether something needs to be done and, if so, makes the appropriate calls.
-  handleKeyPress(event) {
-    const gs = this.props.gameState
+  handleKeyPress(evt) {
+    // If hotkeys are disabled in the settings, ignore keypresses.
+    if (!this.props.settings.useHotkeys)
+      return
 
     // If we're not on the rollboard, disable hotkeys.
     if (!this.props.router.result || this.props.router.result.page !== 'Main')
       return
 
+    // Is it the tilde, meaning we want to show hotkeys?
+    if (evt.key === '`' || evt.key === '~') {
+      this.props.showHotkeys()
+      return
+    }
+
     // Is it an enter or space?
-    if (event.key === ' ' || event.key === 'Enter') {
+    const gs = this.props.gameState
+    if (evt.key === ' ' || evt.key === 'Enter') {
       if (canRollDice(gs)) {
         this.props.rollDice()
-        event.preventDefault()
+        evt.preventDefault()
         return
       }
       if (isGameFinished(gs)) {
         this.props.resetGame()
-        event.preventDefault()
+        evt.preventDefault()
         return
       }
     }
     
-    // Is it a number? And do we either still have rolls left or was the ctrl key pressed? In that case, we should select the corresponding dice.
-    const keyAsInt = parseInt(event.key, 10)
-    if (canClickOnDice(gs) && keyAsInt >= 1 && keyAsInt <= yana.numSides && gs.rollsLeft > 0 && !event.ctrlKey) {
+    // Is it a number? And do we either still have rolls left or was the ctrl key not pressed? In that case, we should select the corresponding dice.
+    const keyAsInt = parseInt(evt.key, 10)
+    if (canClickOnDice(gs) && keyAsInt >= 1 && keyAsInt <= yana.numSides && gs.rollsLeft > 0 && !evt.ctrlKey) {
       this.props.pressNumber(keyAsInt)
-      event.preventDefault()
+      evt.preventDefault()
       return
     }
 
     // Is it a field we need to select?
-    const fieldIndex = this.getFieldFromKey(event.key)
+    const fieldIndex = this.getFieldFromKey(evt.key)
     if (fieldIndex !== -1 && canClickOnField(gs, fieldIndex)) {
       this.props.clickField(fieldIndex)
-      event.preventDefault()
+      evt.preventDefault()
+      return
+    }
+  }
+
+  // handleKeyUp is called when a key goes up again. It's used to turn off settings that only hold as long as a certain key is pressed.
+  handleKeyUp(evt) {
+    // Is it the tilde, meaning we want to not show hotkeys anymore?
+    if (evt.key === '`' || evt.key === '~') {
+      this.props.hideHotkeys()
       return
     }
   }
@@ -97,7 +118,10 @@ class Yahtzee extends Component {
 
   render() {
     return (
-      <div className="yahtzee">
+      <div className={classnames(
+        'yahtzee',
+        { 'showHotkeys': this.props.settings.showHotkeys }
+      )}>
         <Main />
         <ScoreCard />
       </div>
@@ -110,6 +134,7 @@ export default connect(
     return {
       gameState: state.gameState,
       router: state.router,
+      settings: getSettings(state.settings),
     }
   },
   function mapDispatchToProps(dispatch) {
@@ -119,7 +144,9 @@ export default connect(
       pressNumber: (number) => dispatch(gameActions.pressNumber(number)),
       resetGame: () => dispatch(gameActions.resetGame()),
       loadSolution: () => dispatch(gameActions.loadSolution()),
-      goToHome: () => dispatch(replace('/'))
+      showHotkeys: () => dispatch(settingActions.showHotkeys()),
+      hideHotkeys: () => dispatch(settingActions.hideHotkeys()),
+      goToHome: () => dispatch(replace('/')),
     }
   }
 )(Yahtzee)

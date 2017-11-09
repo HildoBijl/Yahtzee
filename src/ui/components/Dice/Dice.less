@@ -53,6 +53,16 @@
     }
   }
 
+  // Hotkey indicator.
+  .diceHotkey {
+    bottom: 2%;
+    color: @hotkeyColor*0.67;
+    font-size: 12px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+  }
+
   // Colors of the dots. We loop through the color list.
   .rollsLeftLoop (@i) when (@i >= 0) {
     &.rollsLeft@{i} {

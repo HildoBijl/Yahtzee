@@ -14,7 +14,9 @@
 @metaFieldBG: #212738;
 @goodColor: #83e51b;
 @badColor: #ff0022;
+@warningColor: 1.2*@canvasBorder;
 @infoColor: #3993f8;
+@hotkeyColor: #20933a*1.5;
 
 // Dice colors.
 @diceColor: #e5e5cd;
@@ -26,3 +28,10 @@
 
 // Time for transitions, like moving dice.
 @transitionTime: 0.3s;
+
+.scoreCardEntryBorder {
+	border-top: 2px solid 1.11*@keepBarBorder;
+	border-right: 2px solid 0.90*@keepBarBorder;
+	border-bottom: 2px solid 0.86*@keepBarBorder;
+	border-left: 2px solid 1.08*@keepBarBorder;
+}

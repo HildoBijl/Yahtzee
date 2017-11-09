@@ -6,7 +6,6 @@ import { select } from 'd3-selection'
 import { histogram, min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
 import { axisLeft, axisBottom } from 'd3-axis'
-import { transition } from 'd3-transition'
 import tip from 'd3-tip'
 
 import statisticsActions from '../../../redux/statistics.js'
@@ -43,11 +42,17 @@ class ScorePlot extends Component {
 			.attr('class', 'd3-tip')
 			.direction('n')
 			.offset([-14, 0])
-			.html(games => `
-				<div class="scorePlotTip">
-					<span class="games">${games.length} games</span>
-					<span class="scores">with scores between ${games.x0} and ${games.x1-1}</span>
-				</div>`)
+			.html(games => {
+				const title = `${games.length}  games`
+				const subtitle = (games.x1 - games.x0 === 1 ?
+					`with scores of ${games.x0}` :
+					`with scores between ${games.x0} and ${games.x1 - 1}`)
+				return `
+					<div class="scorePlotTip">
+						<span class="games">${title}</span>
+						<span class="scores">${subtitle}</span>
+					</div>`
+				})
 		this.svgContainer.call(this.tip)
 		window.t = this.tip
 	}
