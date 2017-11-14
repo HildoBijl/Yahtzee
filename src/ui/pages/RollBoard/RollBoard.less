@@ -1,8 +1,5 @@
 @import '../../params.less';
 
-@keepBarTopPhone: 140px;
-@keepBarTopDesktop: 168px;
-
 // General RollBoard style.
 .rollBoard {
   position: relative;
@@ -62,27 +59,27 @@
     transform: translate(-50%, 0);
     position: absolute;
 
+    top: @keepBarTopPhone - 46px;
+    @media @desktop {
+      top: @keepBarTopDesktop - 46px;
+    }
+
+    &.aside {
+      transform: none;
+      
+      left: 7%;
+      top: @keepBarTopPhone - 52px;
+      @media @desktop {
+        left: 14%;
+        top: @keepBarTopDesktop - 52px;
+      }
+    }
+
     .rollButtonHotkey {
       left: 50%;
       position: absolute;
       top: 80%;
       transform: translateX(-50%);
-    }
-  }
-  .choiceFeedback, .luckFeedback {
-    padding: 7px;
-    position: absolute;
-  }
-  .choiceFeedback {
-    left: 16px;
-  }
-  .luckFeedback {
-    right: 16px;
-  }
-  .rollButton, .choiceFeedback, .luckFeedback {
-    top: @keepBarTopPhone - 46px;
-    @media @desktop {
-      top: @keepBarTopDesktop - 46px;
     }
   }
 

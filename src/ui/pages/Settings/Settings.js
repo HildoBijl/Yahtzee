@@ -30,20 +30,6 @@ class Settings extends Component {
         </div>
 
         <div>
-          <h2>Report card (under construction)</h2>
-          <Radio
-            options={[
-              'Always show report card',
-              'Optional report card: show button',
-              'Never show report card',
-            ]}
-            value={this.props.settings.showReport}
-            changeFunction={(showReport) => this.props.applySetting({ showReport })}
-          />
-          <p style={{marginTop: '6px'}}>The report card is still being developed</p>
-        </div>
-
-        <div>
           <h2>Direct feedback</h2>
           <Checkbox
             checked={this.props.settings.luckFeedback}
@@ -63,6 +49,20 @@ class Settings extends Component {
         </div>
 
         <div>
+          <h2>Report card (under construction)</h2>
+          <Radio
+            options={[
+              'Always show report card',
+              'Optional report card: show button',
+              'Never show report card',
+            ]}
+            value={this.props.settings.showReport}
+            changeFunction={(showReport) => this.props.applySetting({ showReport })}
+          />
+          <p style={{marginTop: '6px'}}>The report card is still being developed</p>
+        </div>
+
+        <div>
           <h2>Predictive mode (under construction)</h2>
           <p>Predictive mode is still being developed</p>
         </div>
@@ -76,7 +76,7 @@ class Settings extends Component {
       return ''
     return (
       <div>
-        <h2>Delete account</h2>
+        <h2>Delete account (under construction)</h2>
         <p>This will erase all your data</p>
         <span id="deleteAccount" className="btn" onClick={this.checkDeleteAccount.bind(this)}>Delete my account</span>
       </div>
