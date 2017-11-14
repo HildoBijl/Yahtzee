@@ -48,7 +48,6 @@ export function reducer(gs = newGameState(), action) {
   switch (action.type) {
 
     case 'ClickDice': {
-      console.log(action)
       if (!canClickOnDice(gs))
         throw new Error('Cannot select/deselect dice at this moment.')
 

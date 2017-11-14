@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import firebase from '../../../config/firebase.js'
-import userActions from '../../../redux/user.js'
+import userActions, { isSignedIn } from '../../../redux/user.js'
 import statusActions from '../../../redux/status.js'
 import settingActions from '../../../redux/settings.js'
+import statisticsActions from '../../../redux/statistics.js'
 
 import Yahtzee from '../Yahtzee/Yahtzee.js'
 
@@ -25,11 +26,18 @@ class App extends Component {
     window.addEventListener('online',  this.updateOnlineStatus);
     window.addEventListener('offline', this.updateOnlineStatus);
   }
+  componentDidUpdate(prevProps) {
+    // If the user signs in, start listening to updates for statistics. If he signs out, stop listening.
+    if (!isSignedIn(prevProps.user) && isSignedIn(this.props.user))
+      this.props.loadStatistics()
+  }
   componentWillUnmount() {
     // Stop listening for events about going online/offline.
-    window.removeEventListener('online',  this.updateOnlineStatus);
-    window.removeEventListener('offline', this.updateOnlineStatus);
+    window.removeEventListener('online', this.updateOnlineStatus)
+    window.removeEventListener('offline', this.updateOnlineStatus)
   }
+
+  // Render stuff.
   render() {
     return (
       <Yahtzee />
@@ -39,7 +47,9 @@ class App extends Component {
 
 export default connect(
   function mapStateToProps(state) {
-    return {}
+    return {
+      user: state.user,
+    }
   },
   function mapDispatchToProps(dispatch) {
     return {
@@ -48,6 +58,7 @@ export default connect(
       processRedirectError: (error) => dispatch(userActions.processRedirectError(error)),
       setOnlineStatus: (online) => dispatch(statusActions.setOnlineStatus(online)),
       loadLocalSettings: () => dispatch(settingActions.loadLocalSettings()),
+      loadStatistics: () => dispatch(statisticsActions.loadStatistics()),
     }
   }
 )(App)

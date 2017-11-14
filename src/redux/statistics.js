@@ -1,3 +1,4 @@
+import firebase from '../config/firebase.js'
 import { isSignedIn } from './user.js'
 import { selectField, getNumRemainingFields, getGameScore } from './gameState.js'
 
@@ -6,13 +7,20 @@ import { selectField, getNumRemainingFields, getGameScore } from './gameState.js
  */
 
 const actions = {
-  statisticsLoaded: (snapshot) => (
-    (dispatch, getState) => dispatch({
-      type: 'StatisticsLoaded',
-			snapshot,
-      user: getState().user,
-    })
-  ),
+  loadStatistics: () => (
+		(dispatch, getState) => {
+			const user = getState().user
+			if (!isSignedIn(user))
+				return
+      firebase.database().ref('games/' + user.uid).once('value').then((snapshot) => {
+				dispatch({
+					type: 'StatisticsLoaded',
+					games: snapshot.val(),
+          user: user,
+				})
+			})
+		}
+	),
   setStatisticsBounds: (newBounds) => ({
     type: 'SetStatisticsBounds',
     bounds: newBounds,
@@ -33,7 +41,7 @@ export function reducer(statistics = getDefaultState(), action) {
 				return getDefaultState()
 
       // Extract the games from the database, put them in an array and calculate some important parameters.
-      const gamesFromFirebase = action.snapshot.val()
+      const gamesFromFirebase = action.games
       const games = []
       let gamesFinished = 0
       let totalScore = 0

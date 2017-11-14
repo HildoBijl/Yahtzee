@@ -26,7 +26,7 @@ class Settings extends Component {
             label='Use hotkeys'
             changeFunction={(newValue) => this.props.applySetting({ useHotkeys: newValue })}
           />
-          <p>Press <strong>~</strong> to see the hotkeys (when turned on)</p>
+          <p>During a game, press <strong>~</strong> to see the hotkeys</p>
         </div>
 
         <div>

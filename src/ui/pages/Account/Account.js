@@ -5,10 +5,7 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import dateformat from 'dateformat'
 
-import firebase from '../../../config/firebase.js'
-import userActions from '../../../redux/user.js'
-import statisticsActions from '../../../redux/statistics.js'
-import { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
+import userActions, { isSignedIn, isFirebaseReady } from '../../../redux/user.js'
 import { roundToDigits } from '../../../logic/util.js'
 
 import Dice from '../../components/Dice/Dice.js'
@@ -17,33 +14,7 @@ import ScorePlot from '../../components/ScorePlot/ScorePlot.js'
 const hideNotificationAfter = 6000
 
 class Account extends Component {
-
-  // Manage the listeners for the statistics.
-  componentDidMount() {
-    if (isSignedIn(this.props.user))
-      this.startListeningForStatisticUpdates()
-  }
-  componentDidUpdate(prevProps) {
-    // If the user signs in, start listening to updates from the datastore about the amount of games he has played. If he signs out, stop listening.
-    if (!isSignedIn(prevProps.user) && isSignedIn(this.props.user))
-      this.startListeningForStatisticUpdates()
-    if (isSignedIn(prevProps.user) && !isSignedIn(this.props.user))
-      this.stopListeningForStatisticUpdates()
-  }
-  componentWillUnmount() {
-    this.stopListeningForStatisticUpdates()
-  }
   
-  // Manage handlers for the statistics.
-  startListeningForStatisticUpdates() {
-    this.firebaseRef = firebase.database().ref('games/' + this.props.user.uid)
-    this.firebaseRef.on('value', this.props.statisticsLoaded)
-  }
-  stopListeningForStatisticUpdates() {
-    if (this.firebaseRef)
-      this.firebaseRef.off()
-  }
-
   // The following functions are about rendering stuff.
   getNotification() {
     // Check if a notification exists.
@@ -63,10 +34,6 @@ class Account extends Component {
     } else {
       return <p className="notification hidden"></p>
     }
-  }
-
-  setStatisticsBounds(bounds) {
-    this.props.setStatisticsBounds(bounds)
   }
 
   render() {
@@ -206,8 +173,6 @@ export default connect(
       signInGoogle: (redirect) => dispatch(userActions.signInGoogle(redirect)),
       signInFacebook: (redirect) => dispatch(userActions.signInFacebook(redirect)),
       signOut: () => dispatch(userActions.signOut()),
-      statisticsLoaded: (snapshot) => dispatch(statisticsActions.statisticsLoaded(snapshot)),
-      setStatisticsBounds: (bounds) => dispatch(statisticsActions.setStatisticsBounds(bounds)),
     }
   }
 )(Account)
