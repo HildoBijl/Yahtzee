@@ -112,9 +112,9 @@ const defaultSettings = {
 	useHotkeys: true,
 	showHotkeys: false, // This one isn't saved, but is used to determine whether to show hotkeys now or not.
 	showReport: 1,
-	luckFeedback: false,
-	choiceFeedback: false,
-	scoreFeedback: false,
+	luckFeedback: true,
+	choiceFeedback: true,
+	scoreFeedback: true,
 }
 
 function isValidSetting(setting) {

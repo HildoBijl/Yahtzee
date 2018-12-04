@@ -23,8 +23,8 @@ class App extends Component {
     if (!this.updateOnlineStatus)
       this.updateOnlineStatus = () => this.props.setOnlineStatus(navigator.onLine)
     this.updateOnlineStatus()
-    window.addEventListener('online',  this.updateOnlineStatus);
-    window.addEventListener('offline', this.updateOnlineStatus);
+    window.addEventListener('online',  this.updateOnlineStatus)
+    window.addEventListener('offline', this.updateOnlineStatus)
   }
   componentDidUpdate(prevProps) {
     // If the user signs in, start listening to updates for statistics. If he signs out, stop listening.

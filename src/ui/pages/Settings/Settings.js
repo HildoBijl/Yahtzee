@@ -7,7 +7,7 @@ import settingActions, { getSettings } from '../../../redux/settings.js'
 import { isSignedIn } from '../../../redux/user.js'
 
 import Checkbox from '../../components/Checkbox/Checkbox.js'
-import Radio from '../../components/Radio/Radio.js'
+// import Radio from '../../components/Radio/Radio.js'
 
 class Settings extends Component {
   checkDeleteAccount() {
@@ -48,7 +48,7 @@ class Settings extends Component {
           />
         </div>
 
-        <div>
+        {/* <div>
           <h2>Report card (under construction)</h2>
           <Radio
             options={[
@@ -67,7 +67,7 @@ class Settings extends Component {
           <p>Predictive mode is still being developed</p>
         </div>
 
-        {this.renderDeleteData()}
+        {this.renderDeleteData()} */}
       </div>
     )
   }

@@ -74,12 +74,12 @@ class Account extends Component {
           <div className="btn popupLogin" onClick={() => this.props.signInGoogle(false)}>Google sign-in</div>
           <div className="btn popupLogin" onClick={() => this.props.signInFacebook(false)}>Facebook sign-in</div>
         </div>
-        <p className="signInReasons">Signing in has various benefits.</p>
+        <p className="signInReasons">Signing in has two benefits.</p>
         <ul className="signInReasonList">
-          <li>Keep track of statistics.</li>
+          <li>Keep track of your game statistics. (Yes, we have a fancy plot too.)</li>
           <li>Share settings across devices.</li>
-          <li>Predictive mode (still under development).</li>
         </ul>
+        <p>No, I won't sell your data. Who'd be interested in game statistics anyway?</p>
       </div>
     )
   }
